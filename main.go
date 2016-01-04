@@ -14,7 +14,7 @@ import (
 
 var (
 	baseDir     = flag.String("base-dir", ".", "directory where files will be hosted, must be an absolute path")
-	templateDir = flag.String("template-dir", ".", "directory containing templates")
+	templateDir = flag.String("template-dir", "templates/", "directory containing templates")
 
 	errNoTemplate = errors.New("no such template")
 
