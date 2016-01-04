@@ -31,7 +31,7 @@
             {{ range .Children }}
             <tr>
               <td>
-                <a class="mono" href="{{ .Name }}">{{ .Name }}{{ if .IsDir }}/{{ end }}</a>
+                <a class="mono" href="{{ .Name }}{{ if .IsDir }}/{{ end }}">{{ .Name }}{{ if .IsDir }}/{{ end }}</a>
               </td>
               <td>{{ .ModTime.Format "02/01/2006 15:04 MST" }}</td>
               <td class="mono">{{ if .IsDir }}-{{ else }}{{ humanizeBytes .Size }}{{ end }}</td>
