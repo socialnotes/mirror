@@ -4,16 +4,20 @@
   <title>Index of {{ .Path }}</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
   <style>
-  .mono {
-    font-family: monospace;
-  }
+  th, td {text-align:center;}
+  td {font-family: monospace;}
+  td:first-child {text-align: left;}
+  td.dash {text-align: center;}
+  td.dash::after{content:"-";}
+
   </style>
 </head>
 <body>
   <div class="container">
     <div class="row">
-      <div class="eight columns">
-        <h1>Index of {{ .Path }}</h1>
+      <div class="one column"></div>
+      <div class="ten columns">
+        <h1>Index of <small>{{ .Path }}</small></h1>
         <table class="u-full-width">
           <thead>
             <tr>
@@ -24,17 +28,15 @@
           </thead>
           <tbody>
             <tr>
-              <td><a class="mono" href="../">../</a></td>
-              <td> - </td>
-              <td class="mono"> - </td>
+              <td><a href="../">../</a></td>
+              <td class="dash"></td>
+              <td class="dash"></td>
             </tr>
             {{ range .Children }}
             <tr>
-              <td>
-                <a class="mono" href="{{ .Name }}{{ if .IsDir }}/{{ end }}">{{ .Name }}{{ if .IsDir }}/{{ end }}</a>
-              </td>
-              <td>{{ .ModTime.Format "02/01/2006 15:04 MST" }}</td>
-              <td class="mono">{{ if .IsDir }}-{{ else }}{{ humanizeBytes .Size }}{{ end }}</td>
+              <td><a href="{{ .Name }}{{ if .IsDir }}/{{ end }}">{{ .Name }}{{ if .IsDir }}/{{ end }}</a></td>
+              <td>{{ .ModTime.Format "2006-01-02 15:04 MST" }}</td>
+              <td{{ if .IsDir }} class="dash">{{ else }}>{{ humanizeBytes .Size }}{{ end }}</td>
             </tr>
             {{ end }}
           </tbody>
