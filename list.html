@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+  <title>Index of {{ .Path }}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+  <style>
+  .mono {
+    font-family: monospace;
+  }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="eight columns">
+        <h1>Index of {{ .Path }}</h1>
+        <table class="u-full-width">
+          <thead>
+            <tr>
+              <th>Path</th>
+              <th>Last Modified</th>
+              <th>Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><a class="mono" href="../">../</a></td>
+              <td> - </td>
+              <td class="mono"> - </td>
+            </tr>
+            {{ range .Children }}
+            <tr>
+              <td>
+                <a class="mono" href="{{ .Name }}">{{ .Name }}{{ if .IsDir }}/{{ end }}</a>
+              </td>
+              <td>{{ .ModTime.Format "02/01/2006 15:04 MST" }}</td>
+              <td class="mono">{{ if .IsDir }}-{{ else }}{{ humanizeBytes .Size }}{{ end }}</td>
+            </tr>
+            {{ end }}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
