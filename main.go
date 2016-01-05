@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 )
 
 var (
@@ -41,6 +43,30 @@ func humanizeBytes(bytes int64) string {
 	return fmt.Sprintf("%d%s", rest, s)
 }
 
+type fileInfos []os.FileInfo
+
+func (f fileInfos) Len() int {
+	return len(f)
+}
+
+func (f fileInfos) Swap(i, j int) {
+	f[i], f[j] = f[j], f[i]
+}
+
+func (f fileInfos) Less(i, j int) bool {
+	a, b := f[i], f[j]
+	switch {
+	case a.IsDir() && b.IsDir():
+		return strings.Compare(a.Name(), b.Name()) <= 0
+	case a.IsDir():
+		return true
+	case b.IsDir():
+		return false
+	default:
+		return strings.Compare(a.Name(), b.Name()) <= 0
+	}
+}
+
 type mirrorHandler struct {
 	BaseDir string
 
@@ -49,12 +75,15 @@ type mirrorHandler struct {
 }
 
 func (m *mirrorHandler) list(rw http.ResponseWriter, req *http.Request, path string, dir http.File) {
-	children, err := dir.Readdir(128)
+	c, err := dir.Readdir(128)
 	if err != nil && err != io.EOF {
 		log.Printf("[err] fetching children of %s: %s\n", path, err)
 		m.Error(rw, req, err)
 		return
 	}
+
+	children := fileInfos(c)
+	sort.Sort(children)
 
 	rw.WriteHeader(http.StatusOK)
 	err = m.render(rw, "list.html", struct {
@@ -91,8 +120,15 @@ func (m *mirrorHandler) Error(rw http.ResponseWriter, req *http.Request, err err
 	default:
 		msg, status = "500 Internal Server Error", http.StatusInternalServerError
 	}
-	// TODO: render error template
-	http.Error(rw, msg, status)
+
+	rw.WriteHeader(status)
+	m.render(rw, "error.html", struct {
+		Status  int
+		Message string
+	}{
+		Status:  status,
+		Message: msg,
+	})
 }
 
 func (m *mirrorHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {

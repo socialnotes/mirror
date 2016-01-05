@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head>
+  <title>Error {{ .Status }}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="one column"></div>
+      <div class="ten columns">
+        <h1>Error {{ .Status }}</h1>
+        <p>{{ .Message }}</p>
+        <p>Go back <a href="/">home</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
