@@ -60,11 +60,13 @@
         </tr>
       </thead>
       <tbody>
+        {{ if not (eq .Path "/") }}
         <tr>
           <td><a href="../">../</a></td>
           <td class="dash"></td>
           <td class="dash"></td>
         </tr>
+        {{ end }}
         {{ range .Children }}
         <tr>
           <td>

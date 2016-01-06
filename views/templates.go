@@ -13,6 +13,7 @@ var (
 
 	funcs = template.FuncMap{
 		"humanizeBytes": humanizeBytes,
+		"eq":            lazyEq,
 	}
 )
 
