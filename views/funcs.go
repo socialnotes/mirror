@@ -1,9 +1,6 @@
 package views
 
-import (
-	"fmt"
-	"strings"
-)
+import "fmt"
 
 func humanizeBytes(bytes int64) string {
 	var (
@@ -18,14 +15,4 @@ func humanizeBytes(bytes int64) string {
 	}
 
 	return fmt.Sprintf("%d%s", rest, scale[n])
-}
-
-func lazyEq(a, b interface{}) bool {
-	as, aok := a.(string)
-	bs, bok := b.(string)
-	if aok && bok {
-		return strings.Compare(as, bs) == 0
-	} else {
-		return a == b
-	}
 }
