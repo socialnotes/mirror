@@ -1,48 +1,79 @@
-<!doctype html>
-<html>
-<head>
-  <title>Index of {{ .Path }}</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
-  <style>
-  th, td {text-align:center;}
-  td {font-family: monospace;}
-  td:first-child {text-align: left;}
-  td.dash {text-align: center;}
-  td.dash::after{content:"-";}
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <title>Index of {{ .Path }}</title>
 
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="row">
-      <div class="one column"></div>
-      <div class="ten columns">
-        <h1>Index of <small>{{ .Path }}</small></h1>
-        <table class="u-full-width">
-          <thead>
-            <tr>
-              <th>Path</th>
-              <th>Last Modified</th>
-              <th>Size</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><a href="../">../</a></td>
-              <td class="dash"></td>
-              <td class="dash"></td>
-            </tr>
-            {{ range .Children }}
-            <tr>
-              <td><a href="{{ .Name }}{{ if .IsDir }}/{{ end }}">{{ .Name }}{{ if .IsDir }}/{{ end }}</a></td>
-              <td>{{ .ModTime.Format "2006-01-02 15:04 MST" }}</td>
-              <td{{ if .IsDir }} class="dash">{{ else }}>{{ humanizeBytes .Size }}{{ end }}</td>
-            </tr>
+    <meta name="author" content="Roberto Bampi">
+    <meta name="author" content="Martin Brugnara">
+    <meta name="author" content="Gianluca Bortoli">
+
+    <style type="text/css">
+      body {
+        padding-top: 30px;
+        font-family: "Helvetica Neue", "Helvetica", "Calibri", "Verdana";
+      }
+
+      table {
+        margin: auto;
+        min-width: 70%;
+      }
+
+      caption {
+        font-size: 2em;
+        font-weight: bold;
+        text-align: left;
+      }
+
+      tr:last-child > * {border-bottom: 1px solid #ddd;}
+
+      th, td {
+        padding: 2px 8px 2px 8px;
+        text-align:center;
+      }
+
+      td {font-family: monospace;}
+      td:first-child {text-align: left;}
+      td.dash {text-align: center;}
+      td.dash::after{content:"-";}
+
+      a, a:hover, a:visited {
+        color: #1EAEDB;
+        text-decoration: none;
+      }
+
+      a:hover {text-decoration: underline;}
+    </style>
+  </head>
+  <body>
+    <table>
+      <caption>Index of <small>{{ .Path }}</small></caption>
+      <thead>
+        <tr>
+          <th>Path</th>
+          <th>Last Modified</th>
+          <th>Size</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="../">../</a></td>
+          <td class="dash"></td>
+          <td class="dash"></td>
+        </tr>
+        {{ range .Children }}
+        <tr>
+          <td>
+            {{ if .IsDir }}
+            <a href="{{ .Name }}/" target="_self">{{ .Name }}/</td>
+            {{ else }}
+            <a href="{{ .Name }}" target="_blank">{{ .Name }}</td>
             {{ end }}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</body>
+          <td>{{ .ModTime.Format "2006-01-02 15:04 MST" }}</td>
+          <td{{ if .IsDir }} class="dash">{{ else }}>{{ humanizeBytes .Size }}{{ end }}</td>
+        </tr>
+        {{ end }}
+      </tbody>
+    </table>
+  </body>
 </html>
