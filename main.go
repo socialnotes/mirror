@@ -11,6 +11,7 @@ import (
 var (
 	baseDir     = flag.String("base-dir", ".", "directory where files will be hosted, must be an absolute path")
 	templateDir = flag.String("template-dir", "templates/", "directory containing templates")
+	addr        = flag.String("port", ":8080", "bind to <address:port>")
 )
 
 func main() {
@@ -22,5 +23,5 @@ func main() {
 	fs := http.Dir(*baseDir)
 	sh := views.NewServerHandler(fs, ts)
 	http.Handle("/", sh)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(http.ListenAndServe(*addr, nil))
 }
