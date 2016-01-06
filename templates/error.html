@@ -1,19 +1,46 @@
-<!doctype html>
-<html>
-<head>
-  <title>Error {{ .Status }}</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
-</head>
-<body>
-  <div class="container">
-    <div class="row">
-      <div class="one column"></div>
-      <div class="ten columns">
-        <h1>Error {{ .Status }}</h1>
-        <p>{{ .Message }}</p>
-        <p>Go back <a href="/">home</a></p>
-      </div>
-    </div>
-  </div>
-</body>
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <title>Error {{ .Status }}</title>
+
+    <meta name="author" content="Roberto Bampi (bampi.roberto@gmail.com)">
+    <meta name="author" content="Martin Brugnara (martin.brugnara@gmail.com)">
+    <meta name="author" content="Gianluca Bortoli (giallogiallo93@gmail.com)">
+
+    <style type="text/css">
+      body {
+        padding: 30px 10px 0 10px;
+        font-family: "Helvetica Neue", "Helvetica", "Calibri", "Verdana";
+        text-align: center; /* crap for centering error message */
+      }
+
+      section {
+        display: inline-block;
+        /*
+        position: relative;
+        margin: auto;
+        */
+        text-align: left;
+        min-width: 60%;
+      }
+      @media only screen and (max-width: 767px) {section {width: 100%;}}
+
+      h1 {color:#CE4844;}
+
+      a, a:hover, a:visited {
+        color: #1EAEDB;
+        text-decoration: none;
+      }
+
+      a:hover {text-decoration: underline;}
+    </style>
+  </head>
+  <body>
+    <section>
+      <h1>Error {{ .Status }}</h1>
+      <h3>{{ .Message }}</h3>
+      <p>Go back <a href="/">home</a></p>
+    </section>
+  </body>
 </html>

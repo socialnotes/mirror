@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <title>Index of {{ .Path }}</title>
 
-    <meta name="author" content="Roberto Bampi">
-    <meta name="author" content="Martin Brugnara">
-    <meta name="author" content="Gianluca Bortoli">
+    <meta name="author" content="Roberto Bampi (bampi.roberto@gmail.com)">
+    <meta name="author" content="Martin Brugnara (martin.brugnara@gmail.com)">
+    <meta name="author" content="Gianluca Bortoli (giallogiallo93@gmail.com)">
 
     <style type="text/css">
       body {
-        padding-top: 30px;
+        padding: 30px 10px 0 10px;
         font-family: "Helvetica Neue", "Helvetica", "Calibri", "Verdana";
       }
 
@@ -18,6 +18,8 @@
         margin: auto;
         min-width: 70%;
       }
+
+      @media only screen and (max-width: 767px) {table {width: 100%;}}
 
       caption {
         font-size: 2em;
@@ -36,6 +38,8 @@
       td:first-child {text-align: left;}
       td.dash {text-align: center;}
       td.dash::after{content:"-";}
+
+      tfoot td {text-align: center !important;}
 
       a, a:hover, a:visited {
         color: #1EAEDB;
@@ -74,7 +78,11 @@
         </tr>
         {{ end }}
       </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3">Upload a new file <a href="/upload{{ .Path }}">HERE</a></td>
+        </tr>
+      </tfoot>
     </table>
-    <p>Upload a new file <a href="/upload{{ .Path }}">here</a></p>
   </body>
 </html>
