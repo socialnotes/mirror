@@ -7,9 +7,11 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/gigaroby/mirror/fs"
 )
 
-func NewServerHandler(fs http.FileSystem, ts *Templates) *ServerHandler {
+func NewServerHandler(fs fs.Dir, ts *Templates) *ServerHandler {
 	return &ServerHandler{
 		fs: fs,
 		ts: ts,
@@ -17,7 +19,7 @@ func NewServerHandler(fs http.FileSystem, ts *Templates) *ServerHandler {
 }
 
 type ServerHandler struct {
-	fs http.FileSystem
+	fs fs.Dir
 	ts *Templates
 }
 

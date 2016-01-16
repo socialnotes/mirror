@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <title>Index of {{ .Path }}</title>
+
+    <meta name="author" content="Roberto Bampi (bampi.roberto@gmail.com)">
+    <meta name="author" content="Martin Brugnara (martin.brugnara@gmail.com)">
+    <meta name="author" content="Gianluca Bortoli (giallogiallo93@gmail.com)">
+
+    <style type="text/css">
+      body {
+        padding: 30px 10px 0 10px;
+        font-family: "Helvetica Neue", "Helvetica", "Calibri", "Verdana";
+      }
+
+      @media only screen and (max-width: 767px) {table {width: 100%;}}
+    </style>
+  </head>
+  <body>
+    <h1>Upload a new file in {{ .Path }}</h1>
+    <form action="{{ .Path }}" method="post">
+      <fieldset>
+        <label for="document">Document:</label>
+        <input type="file" name="document">
+      </fieldset>
+    </form>
+  </body>
+</html>

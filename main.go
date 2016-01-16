@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gigaroby/mirror/fs"
 	"github.com/gigaroby/mirror/views"
 )
 
@@ -20,8 +21,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("[crit] parsing templates in %s: %s\n", *templateDir, err)
 	}
-	fs := http.Dir(*baseDir)
+	fs := fs.Dir(*baseDir)
 	sh := views.NewServerHandler(fs, ts)
+	uh := views.NewUploadHandler(fs, ts, "/upload")
 	http.Handle("/", sh)
+	http.Handle("/upload/", uh)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
