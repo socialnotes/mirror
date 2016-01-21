@@ -8,6 +8,7 @@ import (
 	"net/mail"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 
 	"github.com/gigaroby/mirror/fs"
@@ -20,7 +21,8 @@ const (
 )
 
 var (
-	errFileExists = errors.New("file exists")
+	errFileExists   = errors.New("file exists")
+	unitnMailRegExp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@([a-zA-Z0-9-]+.)*unitn.(it|eu)$")
 )
 
 type UploadHandler struct {
@@ -45,7 +47,7 @@ func checkEmail(email string) (string, error) {
 		return "", err
 	}
 
-	if !strings.HasSuffix(ma.Address, "unitn.it") {
+	if !unitnMailRegExp.MatchString(ma.Address) {
 		return "", errors.New("not a @unitn.it address")
 	}
 
@@ -114,22 +116,10 @@ func (uh *UploadHandler) copyFiles(req *http.Request, dir string) (string, error
 	return fh.Filename, nil
 }
 
-func (uh *UploadHandler) handleForm(rw http.ResponseWriter, req *http.Request) {
-	rw.WriteHeader(http.StatusOK)
-	uh.ts.Render(rw, "upload.html", struct {
-		UploadPath string
-		FilePath   string
-	}{
-		UploadPath: req.URL.Path,
-		FilePath:   strings.TrimPrefix(req.URL.Path, uh.prefix),
-	})
-}
-
 func (uh *UploadHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	switch req.Method {
-	case "GET":
-		uh.handleForm(rw, req)
-	case "POST":
+	if req.Method == "POST" {
 		uh.handleUpload(rw, req)
+	} else {
+		rw.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }

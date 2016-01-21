@@ -82,7 +82,16 @@
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="3">Upload a new file <a href="/upload{{ .Path }}">HERE</a></td>
+          <td colspan="3">
+            Upload a new file <a href="#">HERE</a>
+            <form action="/upload{{ .Path }}" method="POST" enctype="multipart/form-data"> <!-- display: none -->
+              <br>
+              <label for="email">Unitn email:</label>
+              <input id="email" type="text" pattern="^[a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@(?:[a-zA-Z0-9-]+\.)*unitn\.(?:it|eu)$" placeholder="you@studenti.unitn.it" size="40" required><br>
+              <input type="file" name="fname" multiple="multiple" required>
+              <button type="submit">UPLOAD</button>
+            </form>
+          </td>
         </tr>
       </tfoot>
     </table>
