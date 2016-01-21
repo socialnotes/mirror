@@ -3,6 +3,7 @@ package views
 import (
 	"errors"
 	"html/template"
+	"log"
 	"net/http"
 	"path/filepath"
 )
@@ -22,13 +23,29 @@ type Templates struct {
 }
 
 // Render renders the named template passing the provided data as context.
-func (t *Templates) Render(rw http.ResponseWriter, templateName string, data interface{}) error {
+// If the template does not exist, Render panics
+func (t *Templates) Render(rw http.ResponseWriter, templateName string, data interface{}) {
 	rw.Header().Add("Content-Type", "text/html")
 	template := t.main.Lookup(templateName)
 	if template == nil {
-		return ErrNoTemplate
+		panic("no such template " + templateName)
 	}
-	return template.Execute(rw, data)
+	err := template.Execute(rw, data)
+	if err != nil {
+		log.Printf("[err] while rendering template %s: %s\n", templateName, err)
+	}
+}
+
+// Error renders the error.html template with the given parameters
+func (t *Templates) Error(rw http.ResponseWriter, status int, message string) {
+	rw.WriteHeader(status)
+	t.Render(rw, "error.html", struct {
+		Status  int
+		Message string
+	}{
+		Status:  status,
+		Message: message,
+	})
 }
 
 // NewTemplates creates a new instance of Templates from the provided folder and glob

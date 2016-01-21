@@ -35,43 +35,27 @@ func (sh *ServerHandler) list(rw http.ResponseWriter, req *http.Request, path st
 	sort.Sort(children)
 
 	rw.WriteHeader(http.StatusOK)
-	err = sh.ts.Render(rw, "list.html", struct {
+	sh.ts.Render(rw, "list.html", struct {
 		Path     string
 		Children []os.FileInfo
 	}{
 		Path:     path,
 		Children: children,
 	})
-	if err != nil {
-		log.Printf("[err] while rendering list template: %s\n", err)
-	}
 }
 
 func (sh *ServerHandler) error(rw http.ResponseWriter, req *http.Request, err error) {
-	var (
-		msg    string
-		status int
-	)
+	var status int
 	switch {
 	case os.IsNotExist(err):
-		msg, status = "404 page not found", http.StatusNotFound
+		status = http.StatusNotFound
 	case os.IsPermission(err):
-		msg, status = "403 Forbidden", http.StatusForbidden
+		status = http.StatusForbidden
 	default:
-		msg, status = "500 Internal Server Error", http.StatusInternalServerError
+		status = http.StatusInternalServerError
 	}
 
-	rw.WriteHeader(status)
-	err = sh.ts.Render(rw, "error.html", struct {
-		Status  int
-		Message string
-	}{
-		Status:  status,
-		Message: msg,
-	})
-	if err != nil {
-		log.Printf("[err] while rendering error template: %s\n", err)
-	}
+	sh.ts.Error(rw, status, statusString[status])
 }
 
 func (sh *ServerHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {

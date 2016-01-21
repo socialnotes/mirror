@@ -2,7 +2,7 @@
 <html lang="en-US">
   <head>
     <meta charset="UTF-8">
-    <title>New upload</title>
+    <title>Upload successful</title>
 
     <meta name="author" content="Roberto Bampi (bampi.roberto@gmail.com)">
     <meta name="author" content="Martin Brugnara (martin.brugnara@gmail.com)">
@@ -18,15 +18,8 @@
     </style>
   </head>
   <body>
-    <h1>Upload a new file in {{ .FilePath }}</h1>
-    <form action="{{ .UploadPath }}" method="post" enctype="multipart/form-data">
-      <fieldset>
-        <label for="email">Email:</label>
-        <input type="email" name="email"></input>
-        <label for="document">Document:</label>
-        <input type="file" name="document">
-        <input type="submit" name="submit" caption="submit">
-      </fieldset>
-    </form>
+    <h1>Thank you {{ .Email }}</h1>
+    <p>Your upload of <strong>{{ .Filename }}</strong> was completed successfully.</p>
+    <p>Go <a href="/">home</a> or go to <a href="{{ .Path }}">{{ .Path }}</a></p>
   </body>
 </html>
