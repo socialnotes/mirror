@@ -47,6 +47,34 @@
       }
 
       a:hover {text-decoration: underline;}
+
+      input {
+        text-align: center;
+        margin: 2px;
+      }
+
+      button {
+        border: 0;
+        background-color: #039be5;
+        border-radius: 1px;
+        box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.24), 0 1.5px 6px rgba(0, 0, 0, 0.12);
+        color: #fff;
+        margin: 2px;
+        font-weight: bold;
+      }
+
+      #upload {
+        display: none;
+        -webkit-transition: height 600ms ease-in;
+        -moz-transition: height 600ms ease-in;
+        transition: height 600ms ease-in;
+        pointer-events: none;
+      }
+
+      #upload:target {
+        display: block;
+        pointer-events: auto;
+      }
     </style>
   </head>
   <body>
@@ -83,12 +111,13 @@
       <tfoot>
         <tr>
           <td colspan="3">
-            Upload a new file <a href="#">HERE</a>
-            <form action="/upload{{ .Path }}" method="POST" enctype="multipart/form-data"> <!-- display: none -->
+            Upload a new file <a href="#upload">HERE</a>
+            <form id="upload" action="/upload{{ .Path }}" method="POST" enctype="multipart/form-data"> <!-- display: none -->
               <br>
               <label for="email">Unitn email:</label>
-              <input id="email" type="text" pattern="^[a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@(?:[a-zA-Z0-9-]+\.)*unitn\.(?:it|eu)$" placeholder="you@studenti.unitn.it" size="40" required><br>
-              <input type="file" name="fname" multiple="multiple" required>
+              <input id="email" name="email" type="text" pattern="^[a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@(?:[a-zA-Z0-9-]+\.)*unitn\.(?:it|eu)$" placeholder="you@studenti.unitn.it" size="40" required><br>
+              <input type="file" name="document" required>
+              <!--<input type="file" name="document" multiple="multiple" required>-->
               <button type="submit">UPLOAD</button>
             </form>
           </td>

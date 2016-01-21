@@ -18,11 +18,13 @@ const (
 	megaByte = 1 << 20
 
 	maxInMemoryFormData = 10 * megaByte
+
+	StatusUnprocessableEntity = 422
 )
 
 var (
 	errFileExists   = errors.New("file exists")
-	unitnMailRegExp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@([a-zA-Z0-9-]+.)*unitn.(it|eu)$")
+	unitnMailRegExp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@([a-zA-Z0-9-]+\\.)*unitn\\.(it|eu)$")
 )
 
 type UploadHandler struct {
@@ -48,7 +50,7 @@ func checkEmail(email string) (string, error) {
 	}
 
 	if !unitnMailRegExp.MatchString(ma.Address) {
-		return "", errors.New("not a @unitn.it address")
+		return "", errors.New("not an Unitn address")
 	}
 
 	return ma.Address, nil
@@ -59,8 +61,8 @@ func (uh *UploadHandler) handleUpload(rw http.ResponseWriter, req *http.Request)
 
 	email, err := checkEmail(req.FormValue("email"))
 	if err != nil {
-		status = http.StatusBadRequest
-		uh.ts.Error(rw, status, "Address not valid. Email must be a @unitn.it address.")
+		status = StatusUnprocessableEntity
+		uh.ts.Error(rw, status, "Address not valid. Email must be an Unitn address.")
 		return
 	}
 
@@ -94,6 +96,7 @@ func (uh *UploadHandler) copyFiles(req *http.Request, dir string) (string, error
 		return "", err
 	}
 
+	// TODO: add support for multiple upload
 	f, fh, err := req.FormFile("document")
 	filePath := path.Join(dir, fh.Filename)
 	_, err = uh.fs.Open(filePath)
