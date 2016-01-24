@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/boltdb/bolt"
 	"github.com/gigaroby/mirror/fs"
 )
 
@@ -30,14 +31,16 @@ var (
 type UploadHandler struct {
 	ts *Templates
 	fs fs.Dir
+	db *bolt.DB
 
 	prefix string
 }
 
-func NewUploadHandler(fs fs.Dir, ts *Templates, prefix string) *UploadHandler {
+func NewUploadHandler(fs fs.Dir, ts *Templates, db *bolt.DB, prefix string) *UploadHandler {
 	return &UploadHandler{
 		fs: fs,
 		ts: ts,
+		db: db,
 
 		prefix: prefix,
 	}
@@ -71,7 +74,7 @@ func (uh *UploadHandler) handleUpload(rw http.ResponseWriter, req *http.Request)
 	if err != nil {
 		log.Printf("[err] processing upload for %s: %s\n", path.Join(directory, filename), err)
 		status := http.StatusInternalServerError
-		uh.ts.Error(rw, status, statusString[status])
+		uh.ts.Error(rw, status, http.StatusText(status))
 		return
 	}
 

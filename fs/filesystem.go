@@ -8,10 +8,6 @@ import (
 	"strings"
 )
 
-func checkName(name string) error {
-	return nil
-}
-
 // A Dir implements FileSystem using the native file system restricted to a
 // specific directory tree.
 //
@@ -30,16 +26,6 @@ func (d Dir) Open(name string) (*os.File, error) {
 // Create creates a file truncating it if it already exists
 func (d Dir) Create(name string) (*os.File, error) {
 	return d.openFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
-}
-
-// Exists checks whether a file exists
-func (d Dir) Exists(name string) bool {
-	f, err := d.Open(name)
-	if err != nil {
-		return false
-	}
-	f.Close()
-	return true
 }
 
 func (d Dir) openFile(name string, flag int, perm os.FileMode) (*os.File, error) {

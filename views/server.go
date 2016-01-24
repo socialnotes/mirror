@@ -1,108 +1,105 @@
 package views
 
 import (
-	"io"
-	"log"
+	"bytes"
+	"encoding/json"
+	"errors"
 	"net/http"
 	"os"
-	"sort"
-	"strings"
 
+	"github.com/boltdb/bolt"
 	"github.com/gigaroby/mirror/fs"
 )
 
-func NewServerHandler(fs fs.Dir, ts *Templates) *ServerHandler {
+func NewServerHandler(fs fs.Dir, ts *Templates, db *bolt.DB) *ServerHandler {
 	return &ServerHandler{
 		fs: fs,
 		ts: ts,
+		db: db,
 	}
 }
 
 type ServerHandler struct {
 	fs fs.Dir
 	ts *Templates
+	db *bolt.DB
 }
 
-func (sh *ServerHandler) list(rw http.ResponseWriter, req *http.Request, path string, dir http.File) {
-	c, err := dir.Readdir(128)
-	if err != nil && err != io.EOF {
-		log.Printf("[err] fetching children of %s: %s\n", path, err)
-		sh.error(rw, req, err)
-		return
+func (sh *ServerHandler) list(rw http.ResponseWriter, req *http.Request, path string) error {
+	dirs, files, err := directoryContent(sh.db, path)
+
+	if path != "/" {
+		dirs = append([]string{".."}, dirs...)
 	}
 
-	children := fileInfos(c)
-	sort.Sort(children)
+	if err != nil {
+		return errors.New("rendering list template: " + err.Error())
+	}
 
 	rw.WriteHeader(http.StatusOK)
 	sh.ts.Render(rw, "list.html", struct {
-		Path     string
-		Children []os.FileInfo
+		Path        string
+		Directories []string
+		Files       []fs.DBFile
 	}{
-		Path:     path,
-		Children: children,
+		Path:        path,
+		Directories: dirs,
+		Files:       files,
 	})
+	return nil
 }
 
-func (sh *ServerHandler) error(rw http.ResponseWriter, req *http.Request, err error) {
-	var status int
-	switch {
-	case os.IsNotExist(err):
-		status = http.StatusNotFound
-	case os.IsPermission(err):
-		status = http.StatusForbidden
-	default:
-		status = http.StatusInternalServerError
+func (sh *ServerHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) error {
+	var (
+		path  = req.URL.Path
+		found = true
+		isDir = false
+		file  = fs.DBFile{}
+	)
+
+	err := sh.db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(fs.FilesBucket)
+		prefix := []byte(path)
+		c := bucket.Cursor()
+		k, v := c.Seek(prefix)
+		if k == nil || !bytes.HasPrefix(k, prefix) {
+			found = false
+			return nil
+		}
+
+		// it's a file
+		if bytes.Equal(k, prefix) {
+			return json.Unmarshal(v, &file)
+		}
+		isDir = true
+		return nil
+	})
+
+	if err != nil {
+		return err
 	}
 
-	sh.ts.Error(rw, status, statusString[status])
-}
+	if !found {
+		sh.ts.Error(rw, http.StatusNotFound, http.StatusText(http.StatusNotFound))
+		return nil
+	}
 
-func (sh *ServerHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	fpath := req.URL.Path
-	f, err := sh.fs.Open(fpath)
+	if isDir {
+		return sh.list(rw, req, path)
+	}
+
+	f, err := sh.fs.Open(path)
 	if err != nil {
-		log.Printf("[err] opening file %s: %s", fpath, err)
-		sh.error(rw, req, err)
-		return
+		switch {
+		case os.IsNotExist(err):
+			return ViewErr(err, http.StatusNotFound)
+		case os.IsPermission(err):
+			return ViewErr(err, http.StatusForbidden)
+		default:
+			return err
+		}
 	}
 	defer f.Close()
-
-	s, err := f.Stat()
-	if err != nil {
-		log.Printf("[err] getting metadata for %s: %s", fpath, err)
-		sh.error(rw, req, err)
-		return
-	}
-
-	if s.IsDir() {
-		sh.list(rw, req, fpath, f)
-		return
-	}
-
-	http.ServeContent(rw, req, s.Name(), s.ModTime(), f)
-}
-
-type fileInfos []os.FileInfo
-
-func (f fileInfos) Len() int {
-	return len(f)
-}
-
-func (f fileInfos) Swap(i, j int) {
-	f[i], f[j] = f[j], f[i]
-}
-
-func (f fileInfos) Less(i, j int) bool {
-	a, b := f[i], f[j]
-	switch {
-	case a.IsDir() && b.IsDir():
-		return strings.Compare(a.Name(), b.Name()) <= 0
-	case a.IsDir():
-		return true
-	case b.IsDir():
-		return false
-	default:
-		return strings.Compare(a.Name(), b.Name()) <= 0
-	}
+	http.ServeContent(rw, req, file.Name, file.ModTime, f)
+	return nil
 }

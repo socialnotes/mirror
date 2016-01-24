@@ -88,23 +88,18 @@
         </tr>
       </thead>
       <tbody>
-        {{ if not (eq .Path "/") }}
+        {{ range .Directories }}
         <tr>
-          <td><a href="../">../</a></td>
+          <td><a href="{{ . }}/" target="_self">{{ . }}/</td>
           <td class="dash"></td>
           <td class="dash"></td>
         </tr>
         {{ end }}
-        {{ range .Children }}
+        {{ range .Files }}
         <tr>
-          <td>
-            {{ if .IsDir }}
-            <a href="{{ .Name }}/" target="_self">{{ .Name }}/</td>
-            {{ else }}
-            <a href="{{ .Name }}" target="_blank">{{ .Name }}</td>
-            {{ end }}
+          <td><a href="{{ .Name }}" target="_blank">{{ .Name }}</td>
           <td>{{ .ModTime.Format "2006-01-02 15:04 MST" }}</td>
-          <td{{ if .IsDir }} class="dash">{{ else }}>{{ humanizeBytes .Size }}{{ end }}</td>
+          <td>{{ humanizeBytes .Size }}</td>
         </tr>
         {{ end }}
       </tbody>
