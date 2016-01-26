@@ -1,3 +1,6 @@
 mirror
 *.swp
 trash/
+idx
+*.bolt
+*.db

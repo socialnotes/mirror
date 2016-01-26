@@ -1,14 +1,14 @@
 package views
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/mail"
 	"os"
 	"path"
-	"regexp"
 	"strings"
 
 	"github.com/boltdb/bolt"
@@ -24,8 +24,7 @@ const (
 )
 
 var (
-	errFileExists   = errors.New("file exists")
-	unitnMailRegExp = regexp.MustCompile("^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@([a-zA-Z0-9-]+\\.)*unitn\\.(it|eu)$")
+	errFileExists = errors.New("file exists")
 )
 
 type UploadHandler struct {
@@ -52,33 +51,58 @@ func checkEmail(email string) (string, error) {
 		return "", err
 	}
 
-	if !unitnMailRegExp.MatchString(ma.Address) {
-		return "", errors.New("not an Unitn address")
+	if !strings.HasSuffix(ma.Address, "unitn.it") && !strings.HasSuffix(ma.Address, "unitn.eu") {
+		return "", errors.New("not an unitn address")
 	}
 
 	return ma.Address, nil
 }
 
-func (uh *UploadHandler) handleUpload(rw http.ResponseWriter, req *http.Request) {
-	var status int
+func (uh *UploadHandler) handleUpload(rw http.ResponseWriter, req *http.Request) error {
+	var (
+		status    int
+		info      os.FileInfo
+		directory = path.Clean(strings.TrimPrefix(req.URL.Path, uh.prefix))
+	)
 
 	email, err := checkEmail(req.FormValue("email"))
 	if err != nil {
-		status = StatusUnprocessableEntity
-		uh.ts.Error(rw, status, "Address not valid. Email must be an Unitn address.")
-		return
+		status = http.StatusBadRequest
+		uh.ts.Error(rw, status, "The email provided was not valid. Remember that only unitn.it email addresses are accepted.")
+		return nil
 	}
 
-	directory := strings.TrimPrefix(req.URL.Path, uh.prefix)
-	filename, err := uh.copyFiles(req, directory)
+	err = uh.db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(fs.FilesBucket)
+		if exists := bucket.Get([]byte(directory)) != nil; exists {
+			return errFileExists
+		}
+
+		if info, err = uh.copyFiles(req, directory); err != nil {
+			return err
+		}
+		dbf := fs.FromFileInfo(info)
+		// TODO: change this to false and implement verification
+		dbf.Authorized = true
+		dbf.Email = email
+		// TODO: actually generate a token here
+		dbf.Token = ""
+		data, err := json.Marshal(dbf)
+		if err != nil {
+			return err
+		}
+		return bucket.Put([]byte(path.Join(directory, info.Name())), data)
+	})
+
 	if err != nil {
-		log.Printf("[err] processing upload for %s: %s\n", path.Join(directory, filename), err)
-		status := http.StatusInternalServerError
-		uh.ts.Error(rw, status, http.StatusText(status))
-		return
+		if err == errFileExists {
+			status = http.StatusConflict
+			uh.ts.Error(rw, status, "A file with the same name already exists")
+			return nil
+		}
+		return fmt.Errorf("processing upload for %s: %s", path.Join(directory, info.Name()), err)
 	}
 
-	// TODO: insert into bolt a record for the upload
 	// TODO: send email and validate upload
 
 	rw.WriteHeader(http.StatusOK)
@@ -88,44 +112,53 @@ func (uh *UploadHandler) handleUpload(rw http.ResponseWriter, req *http.Request)
 		Email    string
 	}{
 		Path:     directory,
-		Filename: filename,
+		Filename: info.Name(),
 		Email:    email,
 	})
+	return nil
 }
 
-func (uh *UploadHandler) copyFiles(req *http.Request, dir string) (string, error) {
-	_, err := uh.fs.Open(dir)
-	if err != nil {
-		return "", err
-	}
-
+func (uh *UploadHandler) copyFiles(req *http.Request, dir string) (os.FileInfo, error) {
+	// TODO: create intermediate directories
 	// TODO: add support for multiple upload
 	f, fh, err := req.FormFile("document")
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
 	filePath := path.Join(dir, fh.Filename)
-	_, err = uh.fs.Open(filePath)
+	_, err = uh.fs.Stat(filePath)
 	if !os.IsNotExist(err) {
 		if err == nil {
-			return "", errFileExists
+			return nil, errFileExists
 		}
-		return "", err
+		return nil, err
 	}
 
 	fsf, err := uh.fs.Create(filePath)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
+	defer fsf.Close()
 
 	_, err = io.Copy(fsf, f)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return fh.Filename, nil
+
+	fi, err := fsf.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	return fi, nil
 }
 
-func (uh *UploadHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
-	if req.Method == "POST" {
-		uh.handleUpload(rw, req)
-	} else {
+func (uh *UploadHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) error {
+	if req.Method != "POST" {
 		rw.WriteHeader(http.StatusMethodNotAllowed)
+		return nil
 	}
+
+	return uh.handleUpload(rw, req)
 }

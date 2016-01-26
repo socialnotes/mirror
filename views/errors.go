@@ -30,7 +30,6 @@ type ViewHandler interface {
 func ToHandler(v ViewHandler, ts *Templates) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		err := v.ServeHTTP(rw, req)
-		log.Printf("here\n")
 		if err == nil {
 			return
 		}

@@ -1,6 +1,9 @@
 package fs
 
-import "time"
+import (
+	"os"
+	"time"
+)
 
 var (
 	// FilesBucket is the name of the bucket containing file information
@@ -22,4 +25,14 @@ type DBFile struct {
 	Token string
 	// Authorized is set to true after the user verified the upload
 	Authorized bool
+}
+
+// FromFileInfo returns an instance of DBFile constructed from a os.FileInfo
+// Email, Token and Authorized are left at their default value
+func FromFileInfo(fi os.FileInfo) DBFile {
+	return DBFile{
+		Name:    fi.Name(),
+		Size:    fi.Size(),
+		ModTime: fi.ModTime(),
+	}
 }

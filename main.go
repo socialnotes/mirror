@@ -35,7 +35,7 @@ func main() {
 
 	fs := fs.Dir(*baseDir)
 	sh := views.ToHandler(views.NewServerHandler(fs, ts, db), ts)
-	uh := views.NewUploadHandler(fs, ts, db, "/upload")
+	uh := views.ToHandler(views.NewUploadHandler(fs, ts, db, "/upload"), ts)
 	http.Handle("/", sh)
 	http.Handle("/upload/", uh)
 	log.Fatal(http.ListenAndServe(*addr, nil))

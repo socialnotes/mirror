@@ -28,22 +28,32 @@ func (d Dir) Create(name string) (*os.File, error) {
 	return d.openFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 }
 
+// Stat returns a FileInfo describing the named file.
+func (d Dir) Stat(name string) (os.FileInfo, error) {
+	path, err := d.cleanPath(name)
+	if err != nil {
+		return nil, err
+	}
+	return os.Stat(path)
+}
+
 func (d Dir) openFile(name string, flag int, perm os.FileMode) (*os.File, error) {
+	path, err := d.cleanPath(name)
+	if err != nil {
+		return nil, err
+	}
+	return os.OpenFile(path, flag, perm)
+}
+
+func (d Dir) cleanPath(name string) (string, error) {
 	if filepath.Separator != '/' && strings.IndexRune(name, filepath.Separator) >= 0 ||
 		strings.Contains(name, "\x00") {
-		return nil, errors.New("http: invalid character in file path")
+		return "", errors.New("invalid character in file path")
 	}
 	dir := string(d)
 	if dir == "" {
 		dir = "."
 	}
-	f, err := os.OpenFile(
-		filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name))),
-		flag,
-		perm,
-	)
-	if err != nil {
-		return nil, err
-	}
-	return f, nil
+
+	return filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name))), nil
 }
