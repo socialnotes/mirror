@@ -13,7 +13,7 @@ import (
 var (
 	addr        = flag.String("port", ":8080", "bind to <address:port>")
 	baseDir     = flag.String("base-dir", ".", "directory where files will be hosted, must be an absolute path")
-	dbPath      = flag.String("db-path", "db.bolt", "bolt database file")
+	dbFile      = flag.String("db-file", "db.bolt", "bolt database file")
 	templateDir = flag.String("template-dir", "templates/", "directory containing templates")
 )
 
@@ -23,10 +23,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("[crit] parsing templates in %s: %s\n", *templateDir, err)
 	}
-	db, err := bolt.Open(*dbPath, 0600, nil)
+	db, err := bolt.Open(*dbFile, 0600, nil)
 	if err != nil {
-		log.Fatalf("[crit] opening database file %s: %s\n", *dbPath, err)
+		log.Fatalf("[crit] opening database file %s: %s\n", *dbFile, err)
 	}
+	defer db.Close()
+	err = views.CheckDatabase(db)
+	if err != nil {
+		log.Fatalf("[crit] checking database %s: %s\n", *dbFile, err)
+	}
+
 	fs := fs.Dir(*baseDir)
 	sh := views.ToHandler(views.NewServerHandler(fs, ts, db), ts)
 	uh := views.NewUploadHandler(fs, ts, db, "/upload")

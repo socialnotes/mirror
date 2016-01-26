@@ -15,7 +15,7 @@ import (
 var (
 	email   = flag.String("email", "admin@mirror.marvinware.com", "email to upload files as")
 	baseDir = flag.String("base-dir", ".", "directory of files to index")
-	dbPath  = flag.String("db-path", "db.bolt", "bolt database file")
+	dbFile  = flag.String("db-file", "db.bolt", "bolt database file")
 
 	verbose = flag.Bool("verbose", true, "be verbose during indexing")
 )
@@ -49,13 +49,13 @@ func walker(b *bolt.Bucket, prefix, email string) filepath.WalkFunc {
 
 func main() {
 	flag.Parse()
-	err := os.Remove(*dbPath)
+	err := os.Remove(*dbFile)
 	if err != nil && !os.IsNotExist(err) {
-		log.Fatalf("[crit] removing %s: %s\n", *dbPath, err)
+		log.Fatalf("[crit] removing %s: %s\n", *dbFile, err)
 	}
-	db, err := bolt.Open(*dbPath, 0600, nil)
+	db, err := bolt.Open(*dbFile, 0600, nil)
 	if err != nil {
-		log.Fatalf("[crit] opening database file %s: %s\n", *dbPath, err)
+		log.Fatalf("[crit] opening database file %s: %s\n", *dbFile, err)
 	}
 	defer db.Close()
 	prefix, err := filepath.Abs(filepath.Clean(*baseDir))

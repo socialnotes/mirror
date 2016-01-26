@@ -3,10 +3,21 @@ package views
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 
 	"github.com/boltdb/bolt"
 	"github.com/gigaroby/mirror/fs"
 )
+
+// CheckDatabase performs sanity checks on the database provided
+func CheckDatabase(db *bolt.DB) error {
+	return db.View(func(tx *bolt.Tx) error {
+		if tx.Bucket(fs.FilesBucket) == nil {
+			return errors.New("no bucket named files")
+		}
+		return nil
+	})
+}
 
 // directoryContent returns the files and directories contained in the indicated subdirectory
 // errors are returned only in case of malformed records in the database
