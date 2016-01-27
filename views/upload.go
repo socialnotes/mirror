@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/mail"
 	"os"
@@ -13,14 +14,8 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/gigaroby/mirror/fs"
-)
-
-const (
-	megaByte = 1 << 20
-
-	maxInMemoryFormData = 10 * megaByte
-
-	StatusUnprocessableEntity = 422
+	"github.com/gigaroby/mirror/mailer"
+	"github.com/satori/go.uuid"
 )
 
 var (
@@ -31,15 +26,17 @@ type UploadHandler struct {
 	ts *Templates
 	fs fs.Dir
 	db *bolt.DB
+	m  *mailer.M
 
 	prefix string
 }
 
-func NewUploadHandler(fs fs.Dir, ts *Templates, db *bolt.DB, prefix string) *UploadHandler {
+func NewUploadHandler(fs fs.Dir, ts *Templates, db *bolt.DB, m *mailer.M, prefix string) *UploadHandler {
 	return &UploadHandler{
 		fs: fs,
 		ts: ts,
 		db: db,
+		m:  m,
 
 		prefix: prefix,
 	}
@@ -63,6 +60,7 @@ func (uh *UploadHandler) handleUpload(rw http.ResponseWriter, req *http.Request)
 		status    int
 		info      os.FileInfo
 		directory = path.Clean(strings.TrimPrefix(req.URL.Path, uh.prefix))
+		dbf       fs.DBFile
 	)
 
 	email, err := checkEmail(req.FormValue("email"))
@@ -81,12 +79,10 @@ func (uh *UploadHandler) handleUpload(rw http.ResponseWriter, req *http.Request)
 		if info, err = uh.copyFiles(req, directory); err != nil {
 			return err
 		}
-		dbf := fs.FromFileInfo(info)
-		// TODO: change this to false and implement verification
+		dbf = fs.FromFileInfo(info)
 		dbf.Authorized = true
 		dbf.Email = email
-		// TODO: actually generate a token here
-		dbf.Token = ""
+		dbf.Token = uuid.NewV4().String()
 		data, err := json.Marshal(dbf)
 		if err != nil {
 			return err
@@ -103,7 +99,11 @@ func (uh *UploadHandler) handleUpload(rw http.ResponseWriter, req *http.Request)
 		return fmt.Errorf("processing upload for %s: %s", path.Join(directory, info.Name()), err)
 	}
 
-	// TODO: send email and validate upload
+	go func() {
+		if err := uh.m.ConfirmUpload(dbf.Email, info.Name(), dbf.Token); err != nil {
+			log.Printf("sending confirmation email for %s: %s\n", path.Join(directory, info.Name()), err)
+		}
+	}()
 
 	rw.WriteHeader(http.StatusOK)
 	uh.ts.Render(rw, "report.html", struct {

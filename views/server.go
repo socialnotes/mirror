@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/boltdb/bolt"
 	"github.com/gigaroby/mirror/fs"
@@ -36,6 +37,14 @@ func (sh *ServerHandler) list(rw http.ResponseWriter, req *http.Request, path st
 		return errors.New("rendering list template: " + err.Error())
 	}
 
+	authorizedFiles := make([]fs.DBFile, 0, len(files))
+	for _, f := range files {
+		if !f.Authorized {
+			continue
+		}
+		authorizedFiles = append(authorizedFiles, f)
+	}
+
 	rw.WriteHeader(http.StatusOK)
 	sh.ts.Render(rw, "list.html", struct {
 		Path        string
@@ -44,7 +53,7 @@ func (sh *ServerHandler) list(rw http.ResponseWriter, req *http.Request, path st
 	}{
 		Path:        path,
 		Directories: dirs,
-		Files:       files,
+		Files:       authorizedFiles,
 	})
 	return nil
 }
@@ -85,7 +94,16 @@ func (sh *ServerHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) er
 	}
 
 	if isDir {
+		if !strings.HasSuffix(path, "/") {
+			http.Redirect(rw, req, path+"/", http.StatusTemporaryRedirect)
+			return nil
+		}
 		return sh.list(rw, req, path)
+	}
+
+	if !file.Authorized {
+		sh.ts.Error(rw, http.StatusNotFound, http.StatusText(http.StatusNotFound))
+		return nil
 	}
 
 	f, err := sh.fs.Open(path)
