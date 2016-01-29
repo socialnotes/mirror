@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <title>Confirmation successful</title>
+
+    <meta name="author" content="Roberto Bampi (bampi.roberto@gmail.com)">
+    <meta name="author" content="Martin Brugnara (martin.brugnara@gmail.com)">
+    <meta name="author" content="Gianluca Bortoli (giallogiallo93@gmail.com)">
+
+    <style type="text/css">
+      body {
+        padding: 30px 10px 0 10px;
+        font-family: "Helvetica Neue", "Helvetica", "Calibri", "Verdana";
+      }
+
+      @media only screen and (max-width: 767px) {table {width: 100%;}}
+    </style>
+  </head>
+  <body>
+    {{ if gt .Confirmed 0 }}
+    <h1>Thank you {{ .Email }}</h1>
+    <p>You successfully confirmed {{ .Confirmed }} files.</p>
+    {{ else }}
+    <h1>No files to confirm.</h1>
+    {{ end }}
+    Go <a href="/">home</a>.
+  </body>
+</html>

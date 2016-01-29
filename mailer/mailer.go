@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/mail"
-	"net/url"
 	"text/template"
 )
 
@@ -26,7 +26,7 @@ var (
   If you didn't upload files on {{ .Domain }} please ignore this email.
 
   Best regards,
-  {{ .Domain }}
+  The team at {{ .Domain }}
   `))
 )
 
@@ -61,8 +61,18 @@ func New(domain, sender, apiKey string) (*M, error) {
 }
 
 func (m *M) ConfirmUpload(to, filename, token string) error {
-	b := new(bytes.Buffer)
-	err := emailTemplate.Execute(b, struct {
+	var (
+		b  = new(bytes.Buffer)
+		mw = multipart.NewWriter(b)
+	)
+	mw.WriteField("from", m.from)
+	mw.WriteField("to", to)
+	mw.WriteField("subject", "confirm upload of "+filename)
+	fw, err := mw.CreateFormField("text")
+	if err != nil {
+		return err
+	}
+	err = emailTemplate.Execute(fw, struct {
 		Domain   string
 		Email    string
 		Filename string
@@ -76,21 +86,14 @@ func (m *M) ConfirmUpload(to, filename, token string) error {
 	if err != nil {
 		return err
 	}
-	v := url.Values{}
-	v.Add("from", m.from)
-	v.Add("to", to)
-	v.Add("subject", "confirm upload of "+filename)
-	v.Add("text", b.String())
+	mw.Close()
 
-	b.Reset()
-	b.WriteString(v.Encode())
-
-	req, err := http.NewRequest("POST", m.endpoint, nil)
+	req, err := http.NewRequest("POST", m.endpoint, b)
 	if err != nil {
 		return err
 	}
 	req.SetBasicAuth("api", m.apiKey)
-	req.Header.Set("content-type", "multipart/form-data")
+	req.Header.Set("Content-Type", mw.FormDataContentType())
 	req.Body = ioutil.NopCloser(b)
 
 	res, err := m.c.Do(req)

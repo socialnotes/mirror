@@ -19,7 +19,7 @@ var (
 	templateDir = flag.String("template-dir", "templates/", "directory containing templates")
 
 	mailgunDomain = flag.String("mailgun-domain", "socialnotes.eu", "mailgun domain to send emails from")
-	mailgunSender = flag.String("mailgun-sender", "Files <files@socialnotes.eu>", "name of the email address that will be used to send emails")
+	mailgunSender = flag.String("mailgun-sender", "SocialNotes <files@socialnotes.eu>", "name of the email address that will be used to send emails")
 	mailgunAPIKey = flag.String("mailgun-api-key", "", "mailgun api key")
 )
 
@@ -47,7 +47,11 @@ func main() {
 	fs := fs.Dir(*baseDir)
 	sh := views.ToHandler(views.NewServerHandler(fs, ts, db), ts)
 	uh := views.ToHandler(views.NewUploadHandler(fs, ts, db, m, "/upload"), ts)
+	ch := views.ToHandler(views.NewConfirmHandler(ts, db, "/confirm"), ts)
+	tos := views.ToHandler(views.NewStaticPageHandler(ts, "tos.html"), ts)
 	http.Handle("/", sh)
+	http.Handle("/tos.html", tos)
 	http.Handle("/upload/", uh)
+	http.Handle("/confirm/", ch)
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }
