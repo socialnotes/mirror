@@ -14,9 +14,16 @@
         font-family: "Helvetica Neue", "Helvetica", "Calibri", "Verdana";
       }
 
-      table {
-        margin: auto;
-        min-width: 70%;
+      table, footer {margin: auto;}
+      table {min-width: 70%;}
+      footer {
+        display: block;
+        margin-top: 60px;
+        border-top: 1px solid #ddd;
+        text-align: center;
+        width :70%;
+        padding: 8px 4px 4px 8px;
+        font-size: 9pt;
       }
 
       @media only screen and (max-width: 767px) {table {width: 100%;}}
@@ -75,6 +82,7 @@
         display: block;
         pointer-events: auto;
       }
+
     </style>
   </head>
   <body>
@@ -119,5 +127,12 @@
         </tr>
       </tfoot>
     </table>
+
+    <footer>
+      According to our <a href="/tos.html" target="_blank">Terms&amp;Conditions</a> you have the right to ask for the removal of Copyrighted content owned by you or your company.
+      If your really do not want to share you work with the other students of this website send an email to
+      <a href="mailto:complaints@socialnotes.eu?subject=Takedown%20Request">complaints@socialnotes.eu</a>
+      reporting the links for the file you want to be taken down.
+    </footer>
   </body>
 </html>
