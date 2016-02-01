@@ -1,3 +1,4 @@
+[![Circle CI](https://circleci.com/gh/socialnotes/mirror.svg?style=shield&circle-token=8972ac38d5a7371716a5a44393986d3b27564223)](https://circleci.com/gh/socialnotes/mirror)
 # Mirror
 This is the software that runs [socialnotes.eu](https://socialnotes.eu/) software.
 
