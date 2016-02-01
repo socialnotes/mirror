@@ -1,13 +1,13 @@
 [![Circle CI](https://circleci.com/gh/socialnotes/mirror.svg?style=shield&circle-token=8972ac38d5a7371716a5a44393986d3b27564223)](https://circleci.com/gh/socialnotes/mirror)
 # Mirror
-This is the software that runs [socialnotes.eu](https://socialnotes.eu/) software.
+This is the software that runs [socialnotes.eu](https://socialnotes.eu/) .
 
 This program aims to improve the university life experience,
 providing a simple an intuitive website,
 dedicated to the students, 
 to share notes and teaching materials.
 It want to be the reference _loco_ for every kind of students,
-being looking for old exams files, or willing to share their knowledge via notes or helping.
+being looking for old exams files, or willing to share their knowledge via notes or just helping.
 
 Even tough a forum is not integrated, the discussion is currently taken on FB groups.
 
@@ -16,11 +16,11 @@ As can be seen [here](https://github.com/socialnotes/mirror/blob/8d62da77c534f32
 it only accepts uploads from users provided with a valid "unitn" email.
 This was necessary to prevent the system from becoming a general file sharing service (with all the related issue).
 
-We are just students working free for the other students.
+We are just students working for free for all the other students.
 This project is __not__ affiliated in any way with the University of Trento.
 
 
-## HOW CAN I CONTRIBUTE:
+## HOW CAN I CONTRIBUTE ?
 - Upload your notes
 
     By design you email will not be shown next to the files you upload;
@@ -40,5 +40,3 @@ This project is __not__ affiliated in any way with the University of Trento.
 
 ## OTHERS:
 [Authors](AUTHORS.md) & License: [MIT](LICENSE.md)
-
-
