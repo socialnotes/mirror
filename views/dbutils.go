@@ -6,7 +6,7 @@ import (
 	"errors"
 
 	"github.com/boltdb/bolt"
-	"github.com/gigaroby/mirror/fs"
+	"github.com/socialnotes/mirror/fs"
 )
 
 // CheckDatabase performs sanity checks on the database provided

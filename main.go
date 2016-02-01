@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	"github.com/boltdb/bolt"
-	"github.com/gigaroby/mirror/fs"
-	"github.com/gigaroby/mirror/mailer"
-	"github.com/gigaroby/mirror/views"
+	"github.com/socialnotes/mirror/fs"
+	"github.com/socialnotes/mirror/mailer"
+	"github.com/socialnotes/mirror/views"
 )
 
 var (

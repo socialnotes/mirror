@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/boltdb/bolt"
-	"github.com/gigaroby/mirror/fs"
+	"github.com/socialnotes/mirror/fs"
 )
 
 func NewServerHandler(fs fs.Dir, ts *Templates, db *bolt.DB) *ServerHandler {

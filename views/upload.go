@@ -13,8 +13,8 @@ import (
 	"strings"
 
 	"github.com/boltdb/bolt"
-	"github.com/gigaroby/mirror/fs"
-	"github.com/gigaroby/mirror/mailer"
+	"github.com/socialnotes/mirror/fs"
+	"github.com/socialnotes/mirror/mailer"
 	"github.com/satori/go.uuid"
 )
 
