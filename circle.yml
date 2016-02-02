@@ -1,0 +1,8 @@
+test:
+  pre:
+    - go get -u github.com/mattn/goveralls
+    - go get -u github.com/golang/tools/cmd/cover
+  override:
+    - go test -v -cover -race -coverprofile=$HOME/coverage.out
+  post:
+    - $GOPATH/bin/goveralls -coverprofile=$HOME/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
