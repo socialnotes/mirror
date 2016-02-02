@@ -4,4 +4,4 @@ test:
     - go get -u github.com/axw/gocov/gocov
     - go get -u github.com/mattn/goveralls
   override:
-    - goveralls -race -repotoken=$COVERALLS_TOKEN -service=circle-ci
+    - goveralls -repotoken=$COVERALLS_TOKEN -service=circle-ci
