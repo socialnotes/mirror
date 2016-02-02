@@ -5,4 +5,4 @@ test:
   override:
     - go test -v -cover -race -coverprofile=$HOME/coverage.out
   post:
-    - $HOME/bin/goveralls -coverprofile=$HOME/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
+    - goveralls -coverprofile=$HOME/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
