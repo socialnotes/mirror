@@ -110,7 +110,7 @@
       <tfoot>
         <tr>
           <td colspan="3">
-            Upload a new file <a href="#upload">HERE</a>
+            Upload a new file <a href="#upload">in this directory</a>
             <form id="upload" action="/upload{{ .Path }}" method="POST" enctype="multipart/form-data"> <!-- display: none -->
               <br>
               <label for="email">Unitn email:</label>
@@ -118,7 +118,7 @@
               <input type="checkbox" name="tos" value="1" required>&nbsp;Accept <a href="/tos.html" target="_blank">Terms Of Service</a><br>
               <input type="file" name="document" required>
               <!--<input type="file" name="document" multiple="multiple" required>-->
-              <button type="submit">UPLOAD</button>
+              <button type="submit">Upload</button>
             </form>
           </td>
         </tr>
