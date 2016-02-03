@@ -12,7 +12,7 @@ import (
 	"text/template"
 )
 
-const (
+var (
 	mailgunEndpoint = "https://api.mailgun.net/v3"
 )
 
