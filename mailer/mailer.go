@@ -12,8 +12,8 @@ import (
 	"text/template"
 )
 
-var (
-	mailgunEndpoint = "https://api.mailgun.net/v3"
+const (
+	mailgunApiDomain = "https://api.mailgun.net/v3"
 )
 
 var (
@@ -55,7 +55,7 @@ func New(domain, sender, apiKey string) (*M, error) {
 		from:   sender,
 		apiKey: apiKey,
 
-		endpoint: fmt.Sprintf("%s/%s/messages", mailgunEndpoint, domain),
+		endpoint: fmt.Sprintf("%s/%s/messages", mailgunApiDomain, domain),
 		c:        &http.Client{},
 	}, nil
 }
