@@ -1,9 +1,16 @@
 body {
   margin-top: 40px;
+  max-width: 800px;
 }
+
+p { text-align: justify; }
+
 nav {
   display: block;
   width 100%;
+  margin-bottom: 40px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
 }
 
 nav ul {
@@ -46,8 +53,7 @@ button.with-ico {
   border: 0;
 }
 
-#search_input { width: 404px; }
-@media (max-width: 930px) { #search_input { width: 236px; } }
+#search_input { width: 236px; }
 @media (max-width: 715px) {
   nav ul > li:first-child { float: none; }
   nav ul > li:last-child { float: none; }
@@ -57,6 +63,13 @@ button.with-ico {
     margin-bottom: 10px;
   }
   #search_form, #search_input { width: 100%; }
-
 }
 
+footer {
+  display: block;
+  width 100%;
+  margin-top: 40px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+  text-align: center;
+}
