@@ -1,4 +1,5 @@
 mirror
+coverage.out
 *.swp
 trash/
 idx
