@@ -42,27 +42,12 @@
 
     <footer>
       <p>
-      The credits for all the hosted files (notes, slides, exams, <em>etc.</em>) belong to respective original copyright holder.
+      The credits for all the hosted files (notes, slides, exams, <em>etc.</em>) belong to respective original copyright holder.<br>
       Platform source code is licensed under <a href="https://github.com/socialnotes/mirror/blob/master/LICENSE.md" target="_blank">MIT</a>.
       </p>
 
-      <p>
-      According to our <a href="/tos.html" target="_blank">Terms Of Service</a> you have the right to ask for the removal of Copyrighted content owned by you or your company.
-      If you really do not want to share your work with the other students of this website send an email to
-      <a href="mailto:complaints@socialnotes.eu?subject=Takedown%20Request">complaints@socialnotes.eu</a>
-      reporting the links for the file you want to be taken down.
-      </p>
+      {{ block "footer" . }}{{ end }}
 
-      <p>
-        Powered by <a href="https://golang.org/" target="_blank">GO</a>,
-          <a href="www.vim.org" target="_blank">VIM</a>,
-          <a href="www.debian.com" target="_blank">Debian</a>,
-          <a href="https://www.digitalocean.com/" target="_blank">DigitalOcean</a>,
-          <a href="http://fontawesome.io">Font Awesome by Dave Gandy</a>,
-          <a href="http://www.getskeleton.com">Skeleton by Dave Gamache</a>.
-      </p>
-
-      <p><strong>Brought to you</strong> with love by Roberto Bampi, Martin Brugnara, Gianluca Bortoli, Marco Dalla G.</p>
     </footer>
 
     {{ block "foot_js" . }}{{ end }}

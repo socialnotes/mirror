@@ -1,7 +1,10 @@
 {{ define "title" }}Social Notes{{ end }}
 
 {{ define "head" }}
-<link rel="stylesheet" type="text/css" href="/static/css/home.css">
+<style type="text/css">
+  body { max-width: 800px; }
+  .divide { border-top: 1px solid #eee; }
+</style>
 {{ end }}
 
 {{ define "body" }}
@@ -83,8 +86,23 @@
       According to our <a href="/tos.html" target="_blank">ToS</a> you have the right to ask for the removal of Copyrighted content owned by you or your company.
       If you really do not want to share your work with the other students of this website send an email to
       <a href="mailto:complaints@socialnotes.eu?subject=Takedown%20Request">complaints@socialnotes.eu</a>
-      reporting the links for the file you want to be taken down.
+      reporting the link for the file you want to be taken down.
     </p>
   </article>
 </section>
 {{ end }}
+
+{{ define "footer" }}
+<p>
+  Powered by <a href="https://golang.org/" target="_blank">GO</a>,
+    <a href="www.vim.org" target="_blank">VIM</a>,
+    <a href="www.debian.com" target="_blank">Debian</a>,
+    <a href="https://www.digitalocean.com/" target="_blank">DigitalOcean</a>,
+    <a href="http://fontawesome.io">Font Awesome by Dave Gandy</a>,
+    <a href="http://www.getskeleton.com">Skeleton by Dave Gamache</a>.
+</p>
+
+<p><strong>Brought to you</strong> with love by Roberto Bampi, Martin Brugnara, Gianluca Bortoli, Marco Dalla G.</p>
+{{ end }}
+
+{{ template "base.html" . }}
