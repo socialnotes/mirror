@@ -1,94 +1,63 @@
 package views
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
 	"net/http"
-	"os"
+	"path"
 	"strings"
 
-	"github.com/boltdb/bolt"
 	"github.com/socialnotes/mirror/fs"
 )
 
-func NewServerHandler(fs fs.Dir, ts *Templates, db *bolt.DB) *ServerHandler {
+func NewServerHandler(ts *Templates, fs *fs.FileStorage) *ServerHandler {
 	return &ServerHandler{
 		fs: fs,
 		ts: ts,
-		db: db,
 	}
 }
 
 type ServerHandler struct {
-	fs fs.Dir
+	fs *fs.FileStorage
 	ts *Templates
-	db *bolt.DB
 }
 
-func (sh *ServerHandler) list(rw http.ResponseWriter, req *http.Request, path string) error {
-	dirs, files, err := directoryContent(sh.db, path)
+func (sh *ServerHandler) list(path string, rw http.ResponseWriter) error {
+	dirs, files, err := sh.fs.List(path)
+	if err != nil {
+		return err
+	}
 
 	if path != "/" {
 		dirs = append([]string{".."}, dirs...)
 	}
 
-	if err != nil {
-		return errors.New("rendering list template: " + err.Error())
-	}
-
-	authorizedFiles := make([]fs.DBFile, 0, len(files))
+	publicFiles := make([]fs.FileMeta, 0, len(files))
 	for _, f := range files {
-		if !f.Authorized {
-			continue
+		if f.IsPublic() {
+			publicFiles = append(publicFiles, f)
 		}
-		authorizedFiles = append(authorizedFiles, f)
 	}
 
 	rw.WriteHeader(http.StatusOK)
 	sh.ts.Render(rw, "list.html", struct {
 		Path        string
 		Directories []string
-		Files       []fs.DBFile
+		Files       []fs.FileMeta
 	}{
 		Path:        path,
 		Directories: dirs,
-		Files:       authorizedFiles,
+		Files:       publicFiles,
 	})
 	return nil
 }
 
 func (sh *ServerHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) error {
-	var (
-		path  = req.URL.Path
-		found = true
-		isDir = false
-		file  = fs.DBFile{}
-	)
-
-	err := sh.db.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket(fs.FilesBucket)
-		prefix := []byte(path)
-		c := bucket.Cursor()
-		k, v := c.Seek(prefix)
-		if k == nil || !bytes.HasPrefix(k, prefix) {
-			found = false
-			return nil
-		}
-
-		// it's a file
-		if bytes.Equal(k, prefix) {
-			return json.Unmarshal(v, &file)
-		}
-		isDir = true
-		return nil
-	})
-
+	path := path.Clean(req.URL.Path)
+	exists, isDir, fm, err := sh.fs.Stat(path)
 	if err != nil {
 		return err
 	}
 
-	if !found {
+	if !exists {
 		sh.ts.Error(rw, http.StatusNotFound, http.StatusText(http.StatusNotFound))
 		return nil
 	}
@@ -101,21 +70,14 @@ func (sh *ServerHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) er
 		return sh.list(rw, req, path)
 	}
 
-	if !file.Authorized {
+	if !fm.IsPublic() {
 		sh.ts.Error(rw, http.StatusNotFound, http.StatusText(http.StatusNotFound))
 		return nil
 	}
 
 	f, err := sh.fs.Open(path)
 	if err != nil {
-		switch {
-		case os.IsNotExist(err):
-			return ViewErr(err, http.StatusNotFound)
-		case os.IsPermission(err):
-			return ViewErr(err, http.StatusForbidden)
-		default:
-			return err
-		}
+		return err
 	}
 	defer f.Close()
 	http.ServeContent(rw, req, file.Name, file.ModTime, f)
