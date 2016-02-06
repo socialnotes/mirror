@@ -1,140 +1,90 @@
-<!DOCTYPE html>
-<html lang="en-US">
-  <head>
-    <meta charset="UTF-8">
+{{ define "title" }}Social Notes{{ end }}
 
-    <title>Social Notes</title>
-    <link rel="stylesheet" type="text/css" href="statics/css/normalize.css">
-    <link rel="stylesheet" type="text/css" href="statics/css/skeleton.css">
-    <link rel="stylesheet" type="text/css" href="statics/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="statics/css/base.css">
-  </head>
+{{ define "head" }}
+<link rel="stylesheet" type="text/css" href="/static/css/home.css">
+{{ end }}
 
-  <body>
-    <nav>
-      <div class="container">
-        <ul>
-          <li class="brand">Social Notes</li>
-          <li>
-            <form id="search_form" action="/search" method="GET" target="_self" autocomplete="off">
-              <input id="search_input" type="search" name="query" class="search with-ico" placeholder="Search">
-                <button type="submit" class="no-style with-ico">
-                  <i class="fa fa-search">&nbsp;</i>
-                </button>
-            </form>
-          </li>
-          <li><a href="/files/" target="_self" class="button"><i class="fa fa-files-o">&nbsp;</i>Files root</a></li>
-        </ul>
-      </div>
-    </nav>
+{{ define "body" }}
+<section name="who_we_are" class="container">
+  <h3>Hello there!</h3>
+  <p><strong>What is this?</strong>
+  This website aims to improve your university life experience.
 
-    <section name="who_we_are" class="container">
-      <h3>Hello there!</h3>
-      <p><strong>What is this?</strong>
-      This website aims to improve your university life experience.
+  Here you can find notes, exams, and teaching material
+  created or gathered by other students before you.
+  Key resources that these great women and men shared with all of us,
+  asking nothing for their efforts and time.
 
-      Here you can find notes, exams, and teaching material
-      created or gathered by other students before you.
-      Key resources that these great women and men shared with all of us,
-      asking nothing for their efforts and time.
+  As first user of this service we want to thank them all from our hearts.
+  </p>
 
-      As first user of this service we want to thank them all from our hearts.
-      </p>
+  <p><strong>We wish to invite you</strong> to join this dynamic community
+    exploiting the knowledge of our artifacts
+    and participating in the creation and sharing of new ones.</p>
+</section>
 
-      <p><strong>We wish to invite you</strong> to join this dynamic community
-        exploiting the knowledge of our artifacts
-        and participating in the creation and sharing of new ones.</p>
-    </section>
+<section name="data_links" class="container" style="text-align: center;margin-bottom: 20px;">
+  <a href="/files/master/" target="_self" class="button"><i class="fa fa-files-o">&nbsp;</i>Master Courses</a>
+  <a href="/files/bachelor/" target="_self" class="button"><i class="fa fa-files-o">&nbsp;</i>Bachelor Courses</a>
+</section>
 
-    <section name="data_links" class="container" style="text-align: center;margin-bottom: 20px;">
-      <a href="/files/master/" target="_self" class="button"><i class="fa fa-files-o">&nbsp;</i>Master Courses</a>
-      <a href="/files/bachelor/" target="_self" class="button"><i class="fa fa-files-o">&nbsp;</i>Bachelor Courses</a>
-    </section>
+<section name="find_us" class="container">
+  <p><strong>Want do discuss?</strong> Even thought there isn't any integrated forum <del>yet</del>,
+  you can join us on the <a href="https://www.facebook.com/groups/1602154459996984/" target="_blank">Social Notes Facebook group</a>.
 
-    <section name="find_us" class="container">
-      <p><strong>Want do discuss?</strong> Even thought there isn't any integrated forum <del>yet</del>,
-      you can join us on the <a href="https://www.facebook.com/groups/1602154459996984/" target="_blank">Social Notes Facebook group</a>.
+  <p><strong>Wish to help?</strong>
+    Beautiful! Actually there are many ways you can help.
+  </p>
+  <ul>
+    <li>Upload your notes, exams, slides, <em>etc</em>.</li>
+    <li>Report or fix issues of this website <a href="https://github.com/socialnotes/mirror/issues" target="_blank">here</a>.</li>
+    <li>Propose or implement features for this website <a href="https://github.com/socialnotes/mirror/issues" target="_blank">here</a>.</li>
+  </ul>
+</section>
 
-      <p><strong>Wish to help?</strong>
-        Beautiful! Actually there are many ways you can help.
-      </p>
-      <ul>
-        <li>Upload your notes, exams, slides, <em>etc</em>.</li>
-        <li>Report or fix issues of this website <a href="https://github.com/socialnotes/mirror/issues" target="_blank">here</a>.</li>
-        <li>Propose or implement features for this website <a href="https://github.com/socialnotes/mirror/issues" target="_blank">here</a>.</li>
-      </ul>
-    </section>
+<section class="container divide" name="how_to">
+  <h3>F.A.Q.</h3>
+  <article>
+    <p><strong>How to upload?</strong> It dead simple.</p>
+    <ol>
+      <li>Browse to the directory you find more suitable for your file.</li>
+      <li>Click on "Upload a new file in this directory" by the end of the <em>content list</em>.
+      <li>Fill the form that will appear.</li>
+      <li>Click on the confirm link that will be sent you by email.</li>
+    </ol>
+  </article>
 
-    <section class="container divide" name="how_to">
-      <h3>F.A.Q.</h3>
-      <article>
-        <p><strong>How to upload?</strong> It dead simple.</p>
-        <ol>
-          <li>Browse to the directory you find more suitable for your file.</li>
-          <li>Click on "Upload a new file in this directory" by the end of the <em>content list</em>.
-          <li>Fill the form that will appear.</li>
-          <li>Click on the confirm link that will be sent you by email.</li>
-        </ol>
-      </article>
+  <article>
+    <p><strong>Are there any preferred formats?</strong> Sure!<br>
+      Actually it would be better for the files to be in
+      <strong>plain-text</strong> (.txt, c, <em>etc.</em>) or
+      <strong>.pdf</strong> (scans, converted .ppt, .doc, <em>etc.</em>)
+      <strong>Why?</strong> 1. <em>Portability</em> 2. <em>Indexing</em>.
+      <strong>But</strong> if it's not possible, or easy, or meaningful,
+      or simply you do not have time to target this format your notes
+      are welcome anyway in the original format
+      (other will take care of the conversion if necessary).
+    </p>
+  </article>
 
-      <article>
-        <p><strong>Are there any preferred formats?</strong> Sure!<br>
-          Actually it would be better for the files to be in
-          <strong>plain-text</strong> (.txt, c, <em>etc.</em>) or
-          <strong>.pdf</strong> (scans, converted .ppt, .doc, <em>etc.</em>)
-          <strong>Why?</strong> 1. <em>Portability</em> 2. <em>Indexing</em>.
-          <strong>But</strong> if it's not possible, or easy, or meaningful,
-          or simply you do not have time to target this format your notes
-          are welcome anyway in the original format
-          (other will take care of the conversion if necessary).
-        </p>
-      </article>
+  <article>
+    <p><strong>Intellectual Property</strong><br>
+      Uploaded files' property, copyright, <em>etc.</em>
+      belong to the respective original holder.
+      Uploading a file you grant us only the license to share it on
+      socialnotes.eu platform,
+      and enable the other users to access and use them.
+      For more detailed information read the <a href="/tos.html">ToS</a>.
+    </p>
+  </article>
 
-      <article>
-        <p><strong>Intellectual Property</strong><br>
-          Uploaded files' property, copyright, <em>etc.</em>
-          belong to the respective original holder.
-          Uploading a file you grant us only the license to share it on
-          socialnotes.eu platform,
-          and enable the other users to access and use them.
-          For more detailed information read the <a href="/tos.html">ToS</a>.
-        </p>
-      </article>
-
-      <article>
-        <p><strong>This file is mine!</strong><br>
-          According to our <a href="/tos.html" target="_blank">ToS</a> you have the right to ask for the removal of Copyrighted content owned by you or your company.
-          If you really do not want to share your work with the other students of this website send an email to
-          <a href="mailto:complaints@socialnotes.eu?subject=Takedown%20Request">complaints@socialnotes.eu</a>
-          reporting the links for the file you want to be taken down.
-        </p>
-      </article>
-    </section>
-
-
-    <footer>
-      <section class="container">
-        <strong>Powered by</strong> <a href="https://golang.org/" target="_blank">GO</a>,
-          <a href="www.vim.org" target="_blank">VIM</a>,
-          <a href="www.debian.com" target="_blank">Debian</a>,
-          <a href="https://www.digitalocean.com/" target="_blank">DigitalOcean</a>.
-
-          <br>
-
-          <strong>Brought to you</strong> with love by Roberto Bampi, Martin Brugnara, Gianluca Bortoli, Marco Dalla G.
-
-          <br>
-          <br>
-
-          The credits for all the hosted files (notes, slides, exams, <em>etc.</em>) belong to respective original copyright holder.
-          Platform source code is licensed under <a href="https://github.com/socialnotes/mirror/blob/master/LICENSE.md" target="_blank">MIT</a>.
-
-          <br>
-
-          We would like to thank also
-          <a href="http://fontawesome.io">Font Awesome by Dave Gandy</a>,
-          <a href="http://www.getskeleton.com">Skeleton by Dave Gamache</a>.
-      </section>
-    </footer>
-  </body>
-</html>
+  <article>
+    <p><strong>This file is mine!</strong><br>
+      According to our <a href="/tos.html" target="_blank">ToS</a> you have the right to ask for the removal of Copyrighted content owned by you or your company.
+      If you really do not want to share your work with the other students of this website send an email to
+      <a href="mailto:complaints@socialnotes.eu?subject=Takedown%20Request">complaints@socialnotes.eu</a>
+      reporting the links for the file you want to be taken down.
+    </p>
+  </article>
+</section>
+{{ end }}

@@ -1,9 +1,6 @@
-body {
-  margin-top: 40px;
-  max-width: 800px;
-}
+body { margin: 30px 10px 0 10px; }
 
-p { text-align: justify; }
+/* TODO: clean up nav definition */
 
 nav {
   display: block;
@@ -53,6 +50,7 @@ button.with-ico {
   border: 0;
 }
 
+/* TODO: enlarge on bigger screen 50cols (eg list.html) */
 #search_input { width: 236px; }
 @media (max-width: 715px) {
   nav ul > li:first-child { float: none; }
@@ -74,4 +72,3 @@ footer {
   text-align: center;
 }
 
-.divide { border-top: 1px solid #eee; }

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+
+    <meta name="description" content="Universitary notes, exams, teaching materials archive.">
+    <meta name="keywords" content="UNITN, DISI, Computer science, notes, exams, ">
+
+    <meta name="author" content="Roberto Bampi - bampi.roberto@gmail.com">
+    <meta name="author" content="Martin Brugnara - martin.brugnara@gmail.com">
+    <meta name="author" content="Gianluca Bortoli - giallogiallo93@gmail.com">
+    <meta name="author" content="Marco Dalla G - dallamarco93@gmail.com">
+
+    <title>{{ block "title" . }}Social Notes{{ end }}</title>
+
+    <link rel="stylesheet" type="text/css" href="/static/css/normalize.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/skeleton.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/base.css">
+
+    {{block "head" .}}{{ end }}
+  </head>
+  <body>
+    <nav>
+      <div class="container">
+        <ul>
+          <li class="brand"><a href="/" target="_self">Social Notes</a></li>
+          <li>
+            <form id="search_form" action="/search" method="GET" target="_self" autocomplete="off">
+              <input id="search_input" type="search" name="query" class="search with-ico" placeholder="Search">
+                <button type="submit" class="no-style with-ico">
+                  <i class="fa fa-search">&nbsp;</i>
+                </button>
+            </form>
+          </li>
+          <li><a href="/files/" target="_self" class="button"><i class="fa fa-files-o">&nbsp;</i>Files root</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    {{ block "body" . }}{{ end }}
+
+    <footer>
+      <p>
+      The credits for all the hosted files (notes, slides, exams, <em>etc.</em>) belong to respective original copyright holder.
+      Platform source code is licensed under <a href="https://github.com/socialnotes/mirror/blob/master/LICENSE.md" target="_blank">MIT</a>.
+      </p>
+
+      <p>
+      According to our <a href="/tos.html" target="_blank">Terms Of Service</a> you have the right to ask for the removal of Copyrighted content owned by you or your company.
+      If you really do not want to share your work with the other students of this website send an email to
+      <a href="mailto:complaints@socialnotes.eu?subject=Takedown%20Request">complaints@socialnotes.eu</a>
+      reporting the links for the file you want to be taken down.
+      </p>
+
+      <p>
+        Powered by <a href="https://golang.org/" target="_blank">GO</a>,
+          <a href="www.vim.org" target="_blank">VIM</a>,
+          <a href="www.debian.com" target="_blank">Debian</a>,
+          <a href="https://www.digitalocean.com/" target="_blank">DigitalOcean</a>,
+          <a href="http://fontawesome.io">Font Awesome by Dave Gandy</a>,
+          <a href="http://www.getskeleton.com">Skeleton by Dave Gamache</a>.
+      </p>
+
+      <p><strong>Brought to you</strong> with love by Roberto Bampi, Martin Brugnara, Gianluca Bortoli, Marco Dalla G.</p>
+    </footer>
+
+    {{ block "foot_js" . }}{{ end }}
+  </body>
+</html>
