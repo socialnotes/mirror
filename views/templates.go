@@ -22,11 +22,6 @@ type Templates struct {
 	main *template.Template
 }
 
-// TODO: make Render return an error instead
-func (t *Templates) Exists(templateName string) bool {
-	return t.main.Lookup(templateName) != nil
-}
-
 // Render renders the named template passing the provided data as context.
 // If the template does not exist, Render panics
 func (t *Templates) Render(rw http.ResponseWriter, templateName string, data interface{}) {

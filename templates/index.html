@@ -6,7 +6,8 @@
     {{ template "head" . }}
 
     <style type="text/css">
-      body { max-width: 800px; }
+      body { max-width: 800px; margin-left: auto; margin-right: auto;}
+      @media (min-width: 716px) { #search_input { width: 224px; }}
       .divide { border-top: 1px solid #eee; }
     </style>
   </head>
@@ -99,16 +100,6 @@
 
     <footer>
       {{ template "credits" . }}
-
-      <p>
-        Powered by <a href="https://golang.org/" target="_blank">GO</a>,
-          <a href="www.vim.org" target="_blank">VIM</a>,
-          <a href="www.debian.com" target="_blank">Debian</a>,
-          <a href="https://www.digitalocean.com/" target="_blank">DigitalOcean</a>,
-          <a href="http://fontawesome.io">Font Awesome by Dave Gandy</a>,
-          <a href="http://www.getskeleton.com">Skeleton by Dave Gamache</a>.
-      </p>
-
     </footer>
   </body>
 </html>

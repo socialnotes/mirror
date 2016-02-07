@@ -52,8 +52,8 @@ button.with-ico {
   border: 0;
 }
 
-/* TODO: enlarge on bigger screen 50cols (eg list.html) */
-#search_input { width: 236px; }
+#search_input { width: 404px; }
+@media (max-width: 959px) { #search_input { width: 224px; } }
 @media (max-width: 715px) {
   nav ul > li:first-child { float: none; }
   nav ul > li:last-child { float: none; }
@@ -74,4 +74,4 @@ footer {
   text-align: center;
 }
 
-footer p { margin-bottom: 1rem; text-align: center; }
+footer p { font-size: 1rem;  margin-bottom: .1rem; text-align: center; }
