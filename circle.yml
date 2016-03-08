@@ -5,3 +5,7 @@ test:
     - go get -u github.com/mattn/goveralls
   override:
     - goveralls -v -repotoken=$COVERALLS_TOKEN -service=circle-ci -package=./...
+  
+notify:
+  webhooks:
+    - url: https://dockbit.com/webhooks/fe08593b6bb42d1daf1242e632143b3a108a948e
