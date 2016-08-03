@@ -1,65 +1,52 @@
 package views
 
 import (
-	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strings"
 
-	"github.com/boltdb/bolt"
-	"github.com/socialnotes/mirror/fs"
 	"github.com/satori/go.uuid"
+	"github.com/socialnotes/mirror/fs"
 )
 
 type ConfirmHandler struct {
 	ts *Templates
-	db *bolt.DB
+	fs *fs.FileStorage
 
 	prefix string
 }
 
-func NewConfirmHandler(ts *Templates, db *bolt.DB, prefix string) *ConfirmHandler {
+func NewConfirmHandler(ts *Templates, fs *fs.FileStorage, prefix string) *ConfirmHandler {
 	return &ConfirmHandler{
 		ts: ts,
-		db: db,
+		fs: fs,
 
 		prefix: prefix,
 	}
 }
 
 func (ch *ConfirmHandler) confirm(token string) (string, int, error) {
-	processed := 0
+	toConfirm := make(map[string]fs.FileMeta)
 	email := ""
-	return email, processed, ch.db.Update(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket(fs.FilesBucket)
-		toConfirm := make(map[string]fs.DBFile)
-		dbf := fs.DBFile{}
-
-		err := bucket.ForEach(func(k, v []byte) error {
-			err := json.Unmarshal(v, &dbf)
-			if err != nil {
-				return err
-			}
-			if dbf.Token == token && !dbf.Authorized {
-				toConfirm[string(k)] = dbf
-			}
-			return nil
-		})
-		if err != nil {
-			return err
+	err := ch.fs.ForEach(func(prefix string, fm fs.FileMeta) {
+		if fm.Token == token && !fm.System {
+			fm.Token = ""
+			fm.Enabled = true
 		}
-		for path, dbf := range toConfirm {
-			dbf.Authorized = true
-			v, err := json.Marshal(dbf)
-			if err != nil {
-				return err
-			}
-			bucket.Put([]byte(path), v)
-			email = dbf.Email
-			processed++
-		}
-		return nil
 	})
+	if err != nil {
+		return "", 0, err
+	}
+
+	for path, fm := range toConfirm {
+		err = ch.fs.UpdateMeta(path, fm)
+		if err != nil {
+			return errors.New("failed to update some files: " + err.Error())
+		}
+	}
+
+	return nil, len(toConfirm), error
 }
 
 func (ch *ConfirmHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) error {

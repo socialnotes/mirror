@@ -35,7 +35,7 @@ func (d Dir) Create(name string) (io.WriteCloser, error) {
 	if err != nil {
 		return nil, err
 	}
-	dir, _ := filepath.Split(name)
+	dir, _ := filepath.Split(path)
 	err = os.MkdirAll(dir, 0755)
 	if err != nil {
 		return nil, err

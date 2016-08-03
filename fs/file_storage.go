@@ -46,11 +46,11 @@ type FileStorage struct {
 // Exists is set if the path eixsts and is either a directory or a file
 // If the path is not a directory, fm contains the *FileMeta associated
 // Returns err in case of problems with the bolt database
-func (f *FileStorage) Stat(path string) (exists, isDir bool, fm FileMeta, err error) {
+func (f *FileStorage) Stat(filePath string) (exists, isDir bool, fm FileMeta, err error) {
 	fm = FileMeta{}
 	return exists, isDir, fm, f.DB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(FilesBucket)
-		prefix := []byte(path)
+		prefix := []byte(filePath)
 		k, v := bucket.Cursor().Seek(prefix)
 		if k == nil || !bytes.HasPrefix(k, prefix) {
 			exists = false
@@ -70,11 +70,11 @@ func (f *FileStorage) Stat(path string) (exists, isDir bool, fm FileMeta, err er
 
 // List returns all children of path.
 // If path is not a directory no files will be returned.
-func (f *FileStorage) List(path string) (dirs []string, fms []FileMeta, err error) {
+func (f *FileStorage) List(filePath string) (dirs []string, fms []FileMeta, err error) {
 	dirs = make([]string, 0, 4)
 	fms = make([]FileMeta, 0, 4)
 	return dirs, fms, f.DB.View(func(tx *bolt.Tx) error {
-		prefix := []byte(path)
+		prefix := []byte(filePath)
 		bucket := tx.Bucket(FilesBucket)
 		c := bucket.Cursor()
 		last := []byte{}
@@ -106,8 +106,8 @@ func (f *FileStorage) List(path string) (dirs []string, fms []FileMeta, err erro
 
 // Create
 func (fs *FileStorage) Create(dir, filename string, fm FileMeta, content io.Reader) error {
-	path := path.Join(dir, filename)
-	exists, _, _, err := fs.Stat(path)
+	filePath := path.Join(dir, filename)
+	exists, _, _, err := fs.Stat(filePath)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,7 @@ func (fs *FileStorage) Create(dir, filename string, fm FileMeta, content io.Read
 	return fs.DB.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket(FilesBucket)
 		modTime := time.Now()
-		f, err := fs.FileStore.Create(path)
+		f, err := fs.FileStore.Create(filePath)
 		if err != nil {
 			return err
 		}
@@ -136,7 +136,44 @@ func (fs *FileStorage) Create(dir, filename string, fm FileMeta, content io.Read
 		if err != nil {
 			return err
 		}
-		bucket.Put([]byte(path), data)
+		bucket.Put([]byte(filePath), data)
+		return nil
+	})
+}
+
+func (fs *FileStorage) ForEach(cb func(filePath string, fm FileMeta)) error {
+	return fs.DB.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(FilesBucket)
+		fm := FileMeta{}
+		return bucket.ForEach(func(k, v []byte) error {
+			err := json.Unmarshal(v, &fm)
+			if err != nil {
+				return err
+			}
+			cb(string(k), fm)
+			return nil
+		})
+	})
+}
+
+func (fs *FileStorage) UpdateMeta(dir, filename string, fm FileMeta) error {
+	filePath := path.Join(dir, filename)
+	// filePath = path.Clean(filePath)
+	exists, _, _, err := fs.Stat(filePath)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		return errors.New("filestore: can not update metadata, file does not exist")
+	}
+
+	return fs.DB.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket(FilesBucket)
+		data, err := json.Marshal(fm)
+		if err != nil {
+			return err
+		}
+		bucket.Put([]byte(filePath), data)
 		return nil
 	})
 }

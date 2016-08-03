@@ -45,7 +45,7 @@ func main() {
 	}
 
 	fs := fs.Dir(*baseDir)
-	sh := views.ToHandler(views.NewServerHandler(fs, ts, db), ts)
+	sh := views.ToHandler(views.NewServerHandler(, ts, db), ts)
 	uh := views.ToHandler(views.NewUploadHandler(fs, ts, db, m, "/upload"), ts)
 	ch := views.ToHandler(views.NewConfirmHandler(ts, db, "/confirm"), ts)
 	tos := views.ToHandler(views.NewStaticPageHandler(ts, "tos.html"), ts)

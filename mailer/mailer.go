@@ -72,6 +72,7 @@ func (m *M) ConfirmUpload(to, filename, token string) error {
 	if err != nil {
 		return err
 	}
+
 	err = emailTemplate.Execute(fw, struct {
 		Domain   string
 		Email    string
