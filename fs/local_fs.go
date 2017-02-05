@@ -2,6 +2,7 @@ package fs
 
 import (
 	"errors"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
@@ -19,30 +20,44 @@ import (
 type Dir string
 
 // Open opens a file in read-only mode
-func (d Dir) Open(name string) (*os.File, error) {
-	return d.openFile(name, os.O_RDONLY, 0)
+func (d Dir) Open(name string) (io.ReadCloser, error) {
+	path, err := d.cleanPath(name)
+	if err != nil {
+		return nil, err
+	}
+	return os.Open(path)
 }
 
-// Create creates a file truncating it if it already exists
-func (d Dir) Create(name string) (*os.File, error) {
-	return d.openFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+// Create creates a file truncating it if it already exists.
+// It also creates intermediate directories.
+func (d Dir) Create(name string) (io.WriteCloser, error) {
+	path, err := d.cleanPath(name)
+	if err != nil {
+		return nil, err
+	}
+	dir, _ := filepath.Split(path)
+	err = os.MkdirAll(dir, 0755)
+	if err != nil {
+		return nil, err
+	}
+	return os.Create(path)
 }
 
 // Stat returns a FileInfo describing the named file.
-func (d Dir) Stat(name string) (os.FileInfo, error) {
+func (d Dir) Stat(name string) (*FileInfo, error) {
 	path, err := d.cleanPath(name)
 	if err != nil {
 		return nil, err
 	}
-	return os.Stat(path)
-}
-
-func (d Dir) openFile(name string, flag int, perm os.FileMode) (*os.File, error) {
-	path, err := d.cleanPath(name)
+	fi, err := os.Stat(path)
 	if err != nil {
 		return nil, err
 	}
-	return os.OpenFile(path, flag, perm)
+	return &FileInfo{
+		Name:    fi.Name(),
+		Size:    fi.Size(),
+		ModTime: fi.ModTime(),
+	}, nil
 }
 
 func (d Dir) cleanPath(name string) (string, error) {
