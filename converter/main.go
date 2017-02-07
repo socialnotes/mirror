@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"flag"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
@@ -11,7 +12,7 @@ import (
 )
 
 var (
-	boltFile = flag.String("bolt-file", "db.bolt", "bolt database file")
+	boltFile = flag.String("bolt-file", "bolt.db", "bolt database file")
 	sqlFile  = flag.String("sql-file", "mirror.db", "sqlite output file")
 )
 
@@ -39,12 +40,7 @@ func main() {
 	}
 	defer insert.Close()
 
-	fetcher := &fs.FileStorage{
-		FileStore: nil,
-		DB:        db,
-	}
-
-	err = fetcher.ForEach(func(path string, fm fs.FileMeta) {
+	err = forEach(db, func(path string, fm fs.FileMeta) {
 		enabled := 0
 		if fm.Enabled {
 			enabled = 1
@@ -59,4 +55,19 @@ func main() {
 		log.Fatalf("[crit] reading fileInfos: %s", err)
 	}
 
+}
+
+func forEach(DB *bolt.DB, cb func(filePath string, fm fs.FileMeta)) error {
+	return DB.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte("files"))
+		fm := fs.FileMeta{}
+		return bucket.ForEach(func(k, v []byte) error {
+			err := json.Unmarshal(v, &fm)
+			if err != nil {
+				return err
+			}
+			cb(string(k), fm)
+			return nil
+		})
+	})
 }
