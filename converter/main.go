@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"flag"
 	"log"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/boltdb/bolt"
-	"github.com/socialnotes/mirror/fs"
 )
 
 var (
@@ -18,8 +18,17 @@ var (
 )
 
 var (
-	insertQuery = `insert into files (name, email, token, authorized, uploader) values (?, ?, ?, ?, ?);`
+	insertQuery = `insert into files (name, email, token, authorized, uploaded) values (?, ?, ?, ?, ?);`
 )
+
+type oldMeta struct {
+	Name       string
+	Size       int
+	ModTime    time.Time
+	Email      string
+	Authorized bool
+	Token      string
+}
 
 func main() {
 	flag.Parse()
@@ -40,34 +49,22 @@ func main() {
 		log.Fatalf("[crit] preparing query %s\n", err)
 	}
 	defer insert.Close()
+	fm := oldMeta{}
 
-	err = forEach(db, func(path string, fm fs.FileMeta) {
-		enabled := 0
-		if fm.Enabled {
-			enabled = 1
-		}
-		_, ierr := insert.Exec(path, fm.Email, fm.Token, enabled, fm.Info.ModTime)
-		if ierr != nil {
-			log.Printf("[err] inserting data: %s\n", ierr)
-		}
-	})
-	if err != nil {
-		log.Fatalf("[crit] reading fileInfos: %s", err)
-	}
-
-}
-
-func forEach(DB *bolt.DB, cb func(filePath string, fm fs.FileMeta)) error {
-	return DB.View(func(tx *bolt.Tx) error {
-		bucket := tx.Bucket([]byte("files"))
-		fm := fs.FileMeta{}
-		return bucket.ForEach(func(k, v []byte) error {
-			err := json.Unmarshal(v, &fm)
-			if err != nil {
+	err = db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("files"))
+		return b.ForEach(func(k, v []byte) error {
+			ierr := json.Unmarshal(v, &fm)
+			if ierr != nil {
 				return err
 			}
-			cb(string(k), fm)
-			return nil
+			_, ierr = insert.Exec(string(k), fm.Email, fm.Token, fm.Authorized, fm.ModTime)
+			return ierr
 		})
 	})
+	if err != nil {
+		log.Fatalf("[crit] converting file: %s\n", err)
+	}
+
+	return
 }

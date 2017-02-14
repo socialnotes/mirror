@@ -1,8 +1,16 @@
+# binary
 mirror
+# coverage stuff
 coverage.out
+
 *.swp
 trash/
 idx
+
+# databases n'stuff
 *.bolt
 *.db
+# intellij stuff
 .idea
+# visual studio code stuff
+.vscode
