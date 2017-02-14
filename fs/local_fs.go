@@ -19,13 +19,17 @@ import (
 // An empty Dir is treated as ".".
 type Dir string
 
-// Open opens a file in read-only mode
-func (d Dir) Open(name string) (io.ReadCloser, error) {
+func (d Dir) openFile(name string) (*os.File, error) {
 	path, err := d.cleanPath(name)
 	if err != nil {
 		return nil, err
 	}
 	return os.Open(path)
+}
+
+// Open opens a file in read-only mode
+func (d Dir) Open(name string) (io.ReadCloser, error) {
+	return d.openFile(name)
 }
 
 // Create creates a file truncating it if it already exists.
@@ -44,20 +48,12 @@ func (d Dir) Create(name string) (io.WriteCloser, error) {
 }
 
 // Stat returns a FileInfo describing the named file.
-func (d Dir) Stat(name string) (*FileInfo, error) {
+func (d Dir) Stat(name string) (os.FileInfo, error) {
 	path, err := d.cleanPath(name)
 	if err != nil {
 		return nil, err
 	}
-	fi, err := os.Stat(path)
-	if err != nil {
-		return nil, err
-	}
-	return &FileInfo{
-		Name:    fi.Name(),
-		Size:    fi.Size(),
-		ModTime: fi.ModTime(),
-	}, nil
+	return os.Stat(path)
 }
 
 func (d Dir) cleanPath(name string) (string, error) {
@@ -71,4 +67,13 @@ func (d Dir) cleanPath(name string) (string, error) {
 	}
 
 	return filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name))), nil
+}
+
+func (d Dir) Readdir(path string) ([]os.FileInfo, error) {
+	wd, err := d.openFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return wd.Readdir(-1)
 }

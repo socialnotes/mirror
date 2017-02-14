@@ -4,8 +4,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"flag"
-	_ "github.com/mattn/go-sqlite3"
 	"log"
+
+	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/boltdb/bolt"
 	"github.com/socialnotes/mirror/fs"
@@ -17,7 +18,7 @@ var (
 )
 
 var (
-	insertQuery = `insert into files (name, uploader, token, authorized, uploader) values (?, ?, ?, ?, ?);`
+	insertQuery = `insert into files (name, email, token, authorized, uploader) values (?, ?, ?, ?, ?);`
 )
 
 func main() {
@@ -49,7 +50,6 @@ func main() {
 		if ierr != nil {
 			log.Printf("[err] inserting data: %s\n", ierr)
 		}
-		// fmt.Printf("%s\t%+v\n", path, fm)
 	})
 	if err != nil {
 		log.Fatalf("[crit] reading fileInfos: %s", err)

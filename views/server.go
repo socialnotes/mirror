@@ -52,7 +52,7 @@ func (sh *ServerHandler) list(path string, rw http.ResponseWriter) error {
 
 func (sh *ServerHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) error {
 	path := path.Clean(req.URL.Path)
-	exists, isDir, fm, err := sh.fs.Stat(path)
+	exists, fm, err := sh.fs.Stat(path)
 	if err != nil {
 		return err
 	}
@@ -62,12 +62,12 @@ func (sh *ServerHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) er
 		return nil
 	}
 
-	if isDir {
+	if fm.Info.IsDir() {
 		if !strings.HasSuffix(path, "/") {
 			http.Redirect(rw, req, path+"/", http.StatusTemporaryRedirect)
 			return nil
 		}
-		return sh.list(rw, req, path)
+		return sh.list(path, rw)
 	}
 
 	if !fm.IsPublic() {
@@ -80,6 +80,6 @@ func (sh *ServerHandler) ServeHTTP(rw http.ResponseWriter, req *http.Request) er
 		return err
 	}
 	defer f.Close()
-	http.ServeContent(rw, req, file.Name, file.ModTime, f)
+	http.ServeContent(rw, req, fm.Info.Name(), fm.Info.ModTime(), f)
 	return nil
 }

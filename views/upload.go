@@ -8,7 +8,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 	"github.com/socialnotes/mirror/fs"
 	"github.com/socialnotes/mirror/mailer"
 )
@@ -18,18 +18,18 @@ var (
 )
 
 type UploadHandler struct {
-	ts *Templates
-	fs *fs.FileStorage
-	m  *mailer.M
+	ts      *Templates
+	storage *fs.FileStorage
+	m       *mailer.M
 
 	prefix string
 }
 
-func NewUploadHandler(fs *fs.FileStorage, ts *Templates, m *mailer.M, prefix string) *UploadHandler {
+func NewUploadHandler(ts *Templates, storage *fs.FileStorage, m *mailer.M, prefix string) *UploadHandler {
 	return &UploadHandler{
-		fs: fs,
-		ts: ts,
-		m:  m,
+		ts:      ts,
+		storage: storage,
+		m:       m,
 
 		prefix: prefix,
 	}
@@ -64,23 +64,22 @@ func (uh *UploadHandler) handleUpload(rw http.ResponseWriter, req *http.Request)
 	defer f.Close()
 
 	fm := fs.FileMeta{
-		Email:   email,
-		Enabled: false,
-		Token:   uuid.NewV4().String(),
-		System:  false,
+		Email:      email,
+		Authorized: false,
+		Token:      uuid.NewV4().String(),
 	}
-	err := uh.fs.Create(dir, fh.Filename, f)
+	err = uh.storage.Create(dir, fh.Filename, fm, f)
 	if err != nil {
 		if err == fs.FileExists {
-			uh.ts.Error(rw, status, "A file with the same name already exists")
+			uh.ts.Error(rw, http.StatusBadRequest, "A file with the same name already exists")
 			return nil
 		}
 		return err
 	}
 
 	go func() {
-		if err := uh.m.ConfirmUpload(dbf.Email, info.Name(), dbf.Token); err != nil {
-			log.Printf("sending confirmation email for %s: %s\n", path.Join(directory, info.Name()), err)
+		if err := uh.m.ConfirmUpload(fm.Email, fm.Info.Name(), fm.Token); err != nil {
+			log.Printf("sending confirmation email for %s: %s\n", path.Join(dir, fm.Info.Name()), err)
 		}
 	}()
 
@@ -91,7 +90,7 @@ func (uh *UploadHandler) handleUpload(rw http.ResponseWriter, req *http.Request)
 		Email    string
 	}{
 		Path:     dir,
-		Filename: info.Name(),
+		Filename: fm.Info.Name(),
 		Email:    email,
 	})
 	return nil

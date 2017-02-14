@@ -1,11 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"log"
 	"net/http"
 
-	"github.com/boltdb/bolt"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/socialnotes/mirror/fs"
 	"github.com/socialnotes/mirror/mailer"
 	"github.com/socialnotes/mirror/views"
@@ -15,7 +16,7 @@ var (
 	addr = flag.String("addr", ":8080", "bind to <address:port>")
 
 	baseDir     = flag.String("base-dir", ".", "directory where files will be hosted, must be an absolute path")
-	dbFile      = flag.String("db-file", "db.bolt", "bolt database file")
+	dbFile      = flag.String("db-file", "mirror.db", "sqlite3 database file")
 	templateDir = flag.String("template-dir", "templates/", "directory containing templates")
 
 	mailgunDomain = flag.String("mailgun-domain", "socialnotes.eu", "mailgun domain to send emails from")
@@ -29,25 +30,25 @@ func main() {
 	if err != nil {
 		log.Fatalf("[crit] parsing templates in %s: %s\n", *templateDir, err)
 	}
-	db, err := bolt.Open(*dbFile, 0600, nil)
+
+	db, err := sql.Open("sqlite3", *dbFile)
 	if err != nil {
 		log.Fatalf("[crit] opening database file %s: %s\n", *dbFile, err)
 	}
 	defer db.Close()
-	err = views.CheckDatabase(db)
-	if err != nil {
-		log.Fatalf("[crit] checking database %s: %s\n", *dbFile, err)
-	}
 
 	m, err := mailer.New(*mailgunDomain, *mailgunSender, *mailgunAPIKey)
 	if err != nil {
 		log.Fatalf("[crit] initializing mailer: %s\n", err)
 	}
 
-	fs := fs.Dir(*baseDir)
-	sh := views.ToHandler(views.NewServerHandler(, ts, db), ts)
-	uh := views.ToHandler(views.NewUploadHandler(fs, ts, db, m, "/upload"), ts)
-	ch := views.ToHandler(views.NewConfirmHandler(ts, db, "/confirm"), ts)
+	fileStore := &fs.FileStorage{
+		FS: fs.Dir(*baseDir),
+		DB: db,
+	}
+	sh := views.ToHandler(views.NewServerHandler(ts, fileStore), ts)
+	uh := views.ToHandler(views.NewUploadHandler(ts, fileStore, m, "/upload"), ts)
+	ch := views.ToHandler(views.NewConfirmHandler(ts, fileStore, "/confirm"), ts)
 	tos := views.ToHandler(views.NewStaticPageHandler(ts, "tos.html"), ts)
 	http.Handle("/", sh)
 	http.Handle("/tos.html", tos)
