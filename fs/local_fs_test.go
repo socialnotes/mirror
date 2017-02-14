@@ -36,7 +36,7 @@ func TestDir(t *testing.T) {
 			t.Fatal("failed to get file info: ", err)
 		}
 
-		if fi.Size != int64(len(content)) {
+		if fi.Size() != int64(len(content)) {
 			t.Fatalf("expected file to be %d bytes, file was %d", len(content), fi.Size)
 		}
 
