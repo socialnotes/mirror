@@ -2,3 +2,4 @@
 - Martin Brugnara   - @MartinBrugnara   - martin.brugnara@gmail.com
 - Gianluca Bortoli  - @GianlucaBortoli  - giallogiallo93@gmail.com
 - Marco Dalla G     - @dallagi          - dallamarco93@gmail.com
+- Google            - @google
