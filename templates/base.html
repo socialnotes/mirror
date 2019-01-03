@@ -1,0 +1,53 @@
+{{ define "head" }}
+<meta charset="UTF-8">
+
+<meta name="description" content="Universitary notes, exams, teaching materials archive.">
+<meta name="keywords" content="UNITN, DISI, Computer science, notes, exams, ">
+
+<meta name="author" content="Roberto Bampi - bampi.roberto@gmail.com">
+<meta name="author" content="Martin Brugnara - martin.brugnara@gmail.com">
+<meta name="author" content="Gianluca Bortoli - giallogiallo93@gmail.com">
+<meta name="author" content="Marco Dalla G - dallamarco93@gmail.com">
+
+<title>{{ block "title" . }}Social Notes{{ end }}</title>
+
+<link rel="stylesheet" type="text/css" href="/static/css/normalize.css">
+<link rel="stylesheet" type="text/css" href="/static/css/skeleton.css">
+<link rel="stylesheet" type="text/css" href="/static/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="/static/css/base.css">
+
+{{ end }}
+
+{{ define "nav" }}
+<nav>
+  <div class="container">
+    <ul>
+      <li class="brand"><a href="/" target="_self">Social Notes</a></li>
+      <li>
+        <form id="search_form" action="/search" method="GET" target="_self" autocomplete="off">
+          <input id="search_input" type="search" name="query" class="search with-ico" placeholder="Search">
+            <button type="submit" class="no-style with-ico">
+              <i class="fa fa-search">&nbsp;</i>
+            </button>
+        </form>
+      </li>
+      <li><a href="/files/" target="_self" class="button"><i class="fa fa-files-o">&nbsp;</i>Files root</a></li>
+    </ul>
+  </div>
+</nav>
+{{ end }}
+
+{{ define "credits" }}
+  <p>The credits for all the hosted files (notes, slides, exams, <em>etc.</em>) belong to respective original copyright holder.
+  Platform source code is licensed under <a href="https://github.com/socialnotes/mirror/blob/master/LICENSE.md" target="_blank">MIT</a>.</p>
+
+  <p><strong>Brought to you</strong> with love by Roberto Bampi, Martin Brugnara, Gianluca Bortoli, Marco Dalla G.</p>
+
+  <p>Powered by <a href="https://golang.org/" target="_blank">GO</a>,
+    <a href="www.vim.org" target="_blank">VIM</a>,
+    <a href="www.debian.com" target="_blank">Debian</a>,
+    <a href="https://www.digitalocean.com/" target="_blank">DigitalOcean</a>,
+    <a href="http://fontawesome.io">Font Awesome</a>,
+    <a href="http://www.getskeleton.com">Skeleton</a>.
+  </p>
+{{ end }}

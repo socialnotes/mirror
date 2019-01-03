@@ -1,0 +1,29 @@
+table {width: 100%;}
+
+/* Path */
+table caption { font-size: 2em; font-weight: bold; text-align: left; }
+
+/* LaTeX booktabs */
+tr:last-child > * {border-bottom: 1px solid #ddd;}
+th, td { padding: 2px 8px 2px 8px; text-align:center; }
+tbody td, tfoot td { font-family: monospace; border-bottom: none; }
+
+/* Cell align */
+tbody td:first-child {text-align: left;}
+tbody td.dash {text-align: center;}
+tbody td.dash::after{content:"-";}
+
+/* Upload form */
+#upload {
+  display: none;
+  -webkit-transition: height 600ms ease-in;
+  -moz-transition: height 600ms ease-in;
+  transition: height 600ms ease-in;
+  pointer-events: none;
+  padding-top: 20px;
+}
+
+#upload:target { display: inline-block; pointer-events: auto; }
+#upload:target ~ span { display:none; }
+#upload input { height: auto; text-align: center; }
+#close { position: relative; top: -1rem; margin-left: 2rem; color:red; }
