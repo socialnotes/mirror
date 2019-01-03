@@ -82,7 +82,7 @@ func (uh *UploadHandler) handleUpload(rw http.ResponseWriter, req *http.Request)
 		dbf = fs.FromFileInfo(info)
 		dbf.Authorized = false
 		dbf.Email = email
-		dbf.Token = uuid.NewV4().String()
+		dbf.Token = uuid.Must(uuid.NewV4()).String()
 		data, err := json.Marshal(dbf)
 		if err != nil {
 			return err
